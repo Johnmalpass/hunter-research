@@ -6,7 +6,7 @@
 
 **Tweet 1 — hook**
 
-I'm a 2nd year econ student at UCD. I spent the last 6 months building an autonomous research engine that reads across 18 professional financial silos nobody reads together. It goes public today. Every prediction it makes from June 1 will resolve on a public ledger. Win or lose. 🧵
+2nd year econ at UCD. Spent the last 6 months building a research engine that reads across 18 professional financial silos nobody reads together. It goes public today. Every prediction it makes from June 1 resolves on a public ledger. Win or lose, both on the record. 🧵
 
 ---
 
@@ -18,7 +18,7 @@ Patent lawyers don't read 10-Ks. Insurance actuaries don't read patent filings. 
 
 **Tweet 3 — what it does**
 
-HUNTER pulls dated facts from 18 silos, tears each one into entities / implications / methodology fields / causal arrows, looks for pairs that imply something neither fact implies alone, then tries to destroy each pair. Survivors post to a public board with a name, a direction, a date.
+HUNTER pulls dated facts from 18 silos, breaks each into entities / implications / methodology fields / causal arrows, looks for pairs that imply something neither fact implies alone, then tries to destroy each pair. Survivors post to a public board with an asset, a direction, a date.
 
 ---
 
