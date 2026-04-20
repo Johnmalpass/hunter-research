@@ -5,6 +5,10 @@ affiliation: "University College Dublin"
 date: "April 2026"
 ---
 
+> **DRAFT v0.1 — CENTRAL EMPIRICAL CLAIM PENDING SUMMER 2026 REPLICATION. DO NOT CITE AS AN ESTABLISHED RESULT.**
+>
+> The "Mechanism Monopoly" (100% mechanism kill rate / 0% audience kill rate across 128 completed adversarial reviews) is an empirical pattern observed in the pre‑freeze HUNTER corpus under an earlier pipeline tier. It is held back as a **hypothesis to be tested**, not a finding, until the pre‑registered summer 2026 out‑of‑sample study completes under the frozen pre‑registration (`preregistration.json`, SHA‑256 locked at `f39d2f5ff6b3e695`). The decision rules — replicated if the out‑of‑sample mechanism kill rate exceeds 85% and the audience rate is below 15% at p < 0.001; refuted if the kill‑rate difference inverts or falls below 30% — are fixed in the manifest. This paper is public to claim priority on the framing and methodology; the empirical central claim is provisional.
+
 # The Mechanism Monopoly: Five Empirical Regularities in Cross-Silo Financial Inference
 
 **John Malpass**

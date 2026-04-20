@@ -18,6 +18,10 @@ It is also the measurement platform for a pre‑registered empirical study of *c
 
 Pre‑freeze empirical observations (the mechanism/audience kill asymmetry; the hub‑and‑spoke methodology graph; the bimodal diamond‑score distribution; the negative narrative‑survival correlation; the nine Tarjan cycles) are held back as *hypotheses to be tested*, not findings, until summer replication completes under the frozen pre‑registration.
 
+## Provenance
+
+This repository is the public release of a six‑month private solo build (November 2025 – April 2026). The git history shows a single initial commit because the artifact audit trail was never intended to live in git: it lives in the SHA‑256‑locked pre‑registration manifest (`preregistration.json`, code hash `f39d2f5ff6b3e695`, locked 2026‑04‑19), the timestamped frozen corpus on Zenodo (DOI pending), and the public, timestamped prediction board. Anyone who wants to audit a claim runs `python run.py preregister check` against the manifest; independent replication runs against the frozen Zenodo corpus and the locked code hash, not against the commit history. Papers 5 and 6 in `/papers/` are framing‑priority drafts whose central empirical claims are pending summer 2026 replication — see the banner at the top of each file before citing.
+
 ## A note on the operator
 
 This project is built and run by a single person: John Malpass, second‑year BSc Economics at University College Dublin. That is relevant context for how the work should be read. The repository is public for a reason — priority of discovery is claimed at the moment of posting, and honest public critique is worth more to the project than private reassurance. Prior‑art pointers, design criticism, and replication attempts are all welcome. Contact details are below.

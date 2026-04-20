@@ -5,6 +5,10 @@ author: "John Malpass"
 date: "April 2026"
 ---
 
+> **DRAFT v0.1 — SPECULATIVE EXTENSION OF AN UNREPLICATED HYPOTHESIS. DO NOT CITE AS ESTABLISHED.**
+>
+> This paper extends the "Mechanism Monopoly" hypothesis (see Paper 5, also pending replication) to the **Computational Mechanism Conjecture**. The underlying regularity is unreplicated pre‑freeze data; the 3–7 year window estimate is a stated judgement call, not a measurement. Both are public to claim priority on framing; both should be read as conjectures pending the pre‑registered summer 2026 out‑of‑sample study (`preregistration.json`, SHA‑256 locked at `f39d2f5ff6b3e695`). If Paper 5's central regularity fails to replicate, the Computational Mechanism Conjecture here weakens or falls with it.
+
 # The Computational Collapse of Cross-Silo Alpha
 ### Why the Mechanism Monopoly Implies a Time-Limited Arbitrage Window
 
