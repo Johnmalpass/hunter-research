@@ -1,8 +1,7 @@
 """HUNTER master dashboard.
 
-Single-instrument view over the pre-registration-locked corpus and the
-theory-layer agents. Five tabs: Overview, Corpus, Graph, Hypotheses, Study,
-Operations. Read-only.
+Light, editorial, interactive. Six tabs: Overview, Corpus, Graph, Hypotheses,
+Study, Operations. Read-only.
 
 Run:
     streamlit run master_dashboard.py
@@ -17,6 +16,8 @@ from itertools import combinations
 from pathlib import Path
 
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 ROOT = Path(__file__).parent
@@ -32,156 +33,270 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# --------------------------------------------------------------------------
-# Palette + typography
-# --------------------------------------------------------------------------
-BG        = "#0a0a0b"
-PANEL     = "#111214"
-PANEL_ALT = "#17181b"
-BORDER    = "#232428"
-TEXT      = "#e4e4e7"
-MUTED     = "#737378"
-ACCENT    = "#c9a24b"
-POSITIVE  = "#5d9b63"
-NEGATIVE  = "#b84c4c"
-WARNING   = "#c8963b"
+# ============================================================================
+# Palette
+# ============================================================================
+BG        = "#fafaf9"   # warm white
+CARD      = "#ffffff"
+BORDER    = "#e7e5e4"
+BORDER2   = "#d6d3d1"
+INK       = "#1c1917"
+INK2      = "#44403c"
+MUTED     = "#78716c"
+MUTED2    = "#a8a29e"
+ACCENT    = "#b45309"   # deep warm amber
+ACCENT2   = "#92400e"
+SUCCESS   = "#166534"
+WARNING   = "#a16207"
+ERROR     = "#991b1b"
+CHART_SEQ = [ACCENT, "#1e3a8a", "#166534", "#7c2d12", "#6b21a8", "#065f46", "#9f1239"]
 
+PLOTLY_TMPL = go.layout.Template()
+PLOTLY_TMPL.layout = go.Layout(
+    font=dict(family="-apple-system, 'SF Pro Text', Inter, 'Segoe UI', sans-serif",
+              color=INK, size=13),
+    paper_bgcolor=CARD,
+    plot_bgcolor=CARD,
+    margin=dict(l=20, r=20, t=30, b=30),
+    xaxis=dict(gridcolor=BORDER, linecolor=BORDER, tickcolor=BORDER, zerolinecolor=BORDER),
+    yaxis=dict(gridcolor=BORDER, linecolor=BORDER, tickcolor=BORDER, zerolinecolor=BORDER),
+    colorway=CHART_SEQ,
+    hoverlabel=dict(bgcolor=CARD, bordercolor=BORDER2, font_color=INK, font_size=12),
+)
+
+# ============================================================================
+# Typography + layout CSS
+# ============================================================================
 st.markdown(f"""
 <style>
+    /* App shell */
     .stApp {{ background: {BG}; }}
     html, body, [class*="st-"] {{
-        color: {TEXT};
-        font-family: -apple-system, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
-    }}
-    h1, h2, h3, h4, h5, h6 {{
-        color: {TEXT};
-        font-weight: 500;
-        letter-spacing: -0.005em;
-    }}
-    h1 {{ font-size: 1.35rem; margin: 0 0 2px 0; }}
-    h2 {{
-        font-size: 0.95rem; margin: 28px 0 10px 0;
-        text-transform: uppercase; letter-spacing: 0.08em;
-        color: {MUTED}; font-weight: 600;
-        border-bottom: 1px solid {BORDER}; padding-bottom: 6px;
-    }}
-    h3 {{ font-size: 0.85rem; margin: 18px 0 6px 0;
-          color: {TEXT}; font-weight: 600; letter-spacing: 0.02em; }}
-    p, li, span, div {{ font-size: 0.88rem; }}
-    .stCaption, [data-testid="stCaptionContainer"] {{
-        color: {MUTED}; font-size: 0.78rem;
+        color: {INK};
+        font-family: -apple-system, "SF Pro Text", Inter, "Segoe UI", Helvetica, sans-serif;
     }}
 
-    /* Tab bar */
+    /* Remove the default cramped top padding, add breathing room */
+    [data-testid="stAppViewContainer"] > .main > .block-container {{
+        padding-top: 2.5rem;
+        padding-bottom: 6rem;
+        padding-left: 3.5rem;
+        padding-right: 3.5rem;
+        max-width: 1400px;
+    }}
+
+    /* Headings */
+    h1 {{
+        font-size: 2rem; font-weight: 600; letter-spacing: -0.02em;
+        margin: 0 0 6px 0; color: {INK};
+    }}
+    h2 {{
+        font-size: 0.82rem; font-weight: 600; letter-spacing: 0.12em;
+        text-transform: uppercase; color: {MUTED};
+        margin: 48px 0 18px 0; padding-bottom: 10px;
+        border-bottom: 1px solid {BORDER};
+    }}
+    h3 {{
+        font-size: 1rem; font-weight: 600; color: {INK};
+        margin: 24px 0 10px 0;
+    }}
+    p, li, div, span {{ font-size: 0.95rem; line-height: 1.55; color: {INK2}; }}
+    .stCaption, [data-testid="stCaptionContainer"] {{
+        color: {MUTED}; font-size: 0.85rem; line-height: 1.5;
+    }}
+
+    /* Header strip */
+    .hdr {{
+        display: flex; align-items: baseline; gap: 24px;
+        margin-bottom: 8px;
+    }}
+    .hdr .title {{
+        font-size: 2rem; font-weight: 700; letter-spacing: -0.02em;
+        color: {INK}; margin: 0;
+    }}
+    .hdr .sub {{
+        font-size: 0.95rem; color: {MUTED}; font-weight: 400;
+    }}
+    .hdr-meta {{
+        display: flex; justify-content: flex-end; align-items: center; gap: 16px;
+        padding: 6px 0 26px 0;
+    }}
+    .hdr-meta .phase {{
+        background: {CARD}; border: 1px solid {BORDER};
+        padding: 6px 14px; border-radius: 999px;
+        font-size: 0.78rem; font-weight: 500;
+        color: {ACCENT2}; letter-spacing: 0.06em; text-transform: uppercase;
+    }}
+    .hdr-meta .time {{
+        font-size: 0.8rem; color: {MUTED};
+        font-variant-numeric: tabular-nums;
+    }}
+
+    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {{
         gap: 0; border-bottom: 1px solid {BORDER};
+        margin-bottom: 32px;
     }}
     .stTabs [data-baseweb="tab"] {{
         background: transparent; border-radius: 0;
-        padding: 10px 22px; color: {MUTED};
-        font-weight: 500; font-size: 0.85rem;
+        padding: 12px 28px; color: {MUTED};
+        font-weight: 500; font-size: 0.9rem;
         border-bottom: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
     }}
+    .stTabs [data-baseweb="tab"]:hover {{ color: {INK}; }}
     .stTabs [aria-selected="true"] {{
-        background: transparent; color: {TEXT};
+        background: transparent; color: {ACCENT2};
         border-bottom: 2px solid {ACCENT};
+        font-weight: 600;
     }}
 
-    /* Metrics: small, dense, numeric-tabular */
+    /* Hero metric card */
+    .hero-row {{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin: 10px 0 6px 0;
+    }}
+    .hero-card {{
+        background: {CARD}; border: 1px solid {BORDER};
+        border-radius: 10px; padding: 18px 20px;
+        transition: border-color 0.15s, transform 0.1s;
+    }}
+    .hero-card:hover {{ border-color: {BORDER2}; }}
+    .hero-card .label {{
+        font-size: 0.72rem; color: {MUTED};
+        text-transform: uppercase; letter-spacing: 0.08em;
+        font-weight: 600; margin-bottom: 8px;
+    }}
+    .hero-card .value {{
+        font-size: 1.75rem; font-weight: 600; color: {INK};
+        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
+    }}
+
+    /* Metric (built-in st.metric) */
     [data-testid="stMetricValue"] {{
-        color: {TEXT}; font-size: 1.15rem; font-weight: 500;
+        color: {INK}; font-size: 1.4rem; font-weight: 600;
         font-variant-numeric: tabular-nums;
     }}
     [data-testid="stMetricLabel"] {{
-        color: {MUTED}; font-size: 0.72rem;
-        text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;
+        color: {MUTED}; font-size: 0.74rem;
+        text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
     }}
     [data-testid="stMetricDelta"] {{
-        color: {MUTED}; font-size: 0.72rem; font-variant-numeric: tabular-nums;
+        color: {MUTED}; font-size: 0.8rem; font-variant-numeric: tabular-nums;
     }}
 
     /* Tables */
     .stDataFrame, [data-testid="stDataFrame"] {{
-        background: {PANEL}; border: 1px solid {BORDER}; border-radius: 4px;
+        background: {CARD}; border: 1px solid {BORDER}; border-radius: 8px;
+        overflow: hidden;
     }}
-    .stDataFrame table {{
-        font-variant-numeric: tabular-nums; font-size: 0.82rem;
-    }}
+    .stDataFrame table {{ font-variant-numeric: tabular-nums; font-size: 0.88rem; }}
 
-    /* Expanders */
+    /* Expander */
     .stExpander {{
-        background: {PANEL}; border: 1px solid {BORDER}; border-radius: 4px;
+        background: {CARD}; border: 1px solid {BORDER}; border-radius: 8px;
+        margin: 10px 0;
     }}
-    .stExpander summary {{ color: {TEXT}; }}
+    .stExpander summary {{
+        color: {INK}; font-weight: 500; padding: 12px 16px;
+    }}
+    .stExpander summary:hover {{ color: {ACCENT2}; }}
 
-    /* Horizontal rule */
-    hr {{ border-color: {BORDER}; margin: 18px 0; }}
-
-    /* Sidebar (unused but if ever opened, match palette) */
-    [data-testid="stSidebar"] {{ background: {PANEL}; }}
-
-    /* Remove st.info/st.success/st.error gradient backgrounds */
-    [data-testid="stNotification"] {{
-        background: {PANEL}; border: 1px solid {BORDER};
-        border-left: 3px solid {ACCENT}; color: {TEXT};
+    /* Inputs — search box, selectbox, slider */
+    [data-testid="stTextInput"] input,
+    [data-testid="stSelectbox"] > div > div,
+    [data-baseweb="select"] > div {{
+        background: {CARD} !important;
+        border-color: {BORDER} !important;
+        color: {INK} !important;
+    }}
+    [data-testid="stTextInput"] input:focus {{
+        border-color: {ACCENT} !important;
+        outline: none !important;
     }}
 
-    /* Code blocks */
-    code {{
-        background: {PANEL_ALT}; color: {ACCENT};
-        padding: 1px 5px; border-radius: 3px; font-size: 0.82rem;
-    }}
+    /* HR */
+    hr {{ border: none; border-top: 1px solid {BORDER}; margin: 40px 0; }}
 
-    /* Custom classes */
-    .zero {{
-        background: {PANEL}; border: 1px solid {BORDER};
-        border-left: 3px solid {MUTED};
-        padding: 12px 16px; border-radius: 4px;
-        color: {MUTED}; font-size: 0.85rem;
-    }}
+    /* Divider row */
     .row-item {{
-        background: {PANEL}; border: 1px solid {BORDER};
-        padding: 10px 14px; margin: 4px 0; border-radius: 3px;
-        font-size: 0.86rem;
+        background: {CARD}; border: 1px solid {BORDER};
+        padding: 14px 18px; margin: 8px 0; border-radius: 8px;
+        transition: border-color 0.15s, box-shadow 0.15s;
     }}
-    .row-item .score {{
+    .row-item:hover {{
+        border-color: {BORDER2};
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }}
+    .row-item .score-pill {{
+        display: inline-block;
+        background: {ACCENT}; color: white;
+        padding: 2px 10px; border-radius: 4px;
         font-variant-numeric: tabular-nums; font-weight: 600;
-        margin-right: 10px; color: {ACCENT};
+        font-size: 0.85rem; margin-right: 12px;
     }}
-    .row-item .meta {{ color: {MUTED}; font-size: 0.76rem; margin-top: 3px; }}
-    .row-item .body {{ color: {TEXT}; margin-top: 6px; font-size: 0.82rem; }}
-    .status-ok   {{ color: {POSITIVE}; }}
-    .status-warn {{ color: {WARNING}; }}
-    .status-err  {{ color: {NEGATIVE}; }}
-    .status-idle {{ color: {MUTED}; }}
+    .row-item .title {{ color: {INK}; font-weight: 500; font-size: 0.95rem; }}
+    .row-item .meta {{ color: {MUTED}; font-size: 0.8rem; margin-top: 6px; }}
+    .row-item .body {{ color: {INK2}; margin-top: 10px; font-size: 0.9rem; line-height: 1.6; }}
 
-    /* Header strip */
-    .header-strip {{
-        display: flex; align-items: baseline; gap: 24px;
-        padding: 8px 0 6px 0; margin-bottom: 8px;
-        border-bottom: 1px solid {BORDER};
+    /* Key-value strip (used for pre-reg integrity) */
+    .kv-row {{
+        display: flex; justify-content: space-between;
+        padding: 10px 0; border-bottom: 1px solid {BORDER};
+        font-size: 0.88rem;
     }}
-    .header-strip .title {{
-        font-size: 1.05rem; font-weight: 600; color: {TEXT};
-        letter-spacing: 0.02em;
+    .kv-row:last-child {{ border-bottom: none; }}
+    .kv-row .k {{ color: {MUTED}; }}
+    .kv-row .v {{ color: {INK}; font-variant-numeric: tabular-nums; font-family: ui-monospace, "SF Mono", monospace; }}
+
+    /* Status banner */
+    .banner {{
+        padding: 12px 18px; border-radius: 8px;
+        margin: 16px 0; font-size: 0.9rem;
+        border: 1px solid transparent;
     }}
-    .header-strip .subtitle {{
-        font-size: 0.78rem; color: {MUTED};
-        font-variant-numeric: tabular-nums;
+    .banner.ok   {{ background: #f0fdf4; border-color: #bbf7d0; color: {SUCCESS}; }}
+    .banner.warn {{ background: #fefce8; border-color: #fde68a; color: {WARNING}; }}
+    .banner.err  {{ background: #fef2f2; border-color: #fecaca; color: {ERROR}; }}
+    .banner.neutral {{ background: {CARD}; border-color: {BORDER}; color: {INK2}; }}
+
+    /* Notifications (st.info/success/error) — neutralise to our palette */
+    [data-testid="stNotification"] {{
+        border-radius: 8px; font-size: 0.9rem;
     }}
-    .header-strip .tag {{
-        background: {PANEL}; border: 1px solid {BORDER};
-        padding: 2px 8px; border-radius: 3px;
-        font-size: 0.72rem; color: {MUTED};
-        text-transform: uppercase; letter-spacing: 0.08em;
+
+    /* Code inline */
+    code {{
+        background: #f5f5f4; color: {ACCENT2};
+        padding: 2px 6px; border-radius: 4px;
+        font-size: 0.86rem; font-family: ui-monospace, "SF Mono", monospace;
     }}
+
+    /* Cycle activity row (monospace line-style) */
+    .cycle-line {{
+        font-family: ui-monospace, "SF Mono", monospace;
+        font-size: 0.82rem; padding: 4px 0;
+        border-bottom: 1px dashed {BORDER};
+    }}
+    .cycle-line:last-child {{ border-bottom: none; }}
+    .cycle-line .ts {{ color: {MUTED}; margin-right: 10px; }}
+    .cycle-line .ok {{ color: {SUCCESS}; font-weight: 600; }}
+    .cycle-line .warn {{ color: {WARNING}; font-weight: 600; }}
+    .cycle-line .err {{ color: {ERROR}; font-weight: 600; }}
+    .cycle-line .domain {{ color: {INK}; margin-left: 10px; }}
+
+    /* Footer */
+    footer, [data-testid="stFooter"] {{ visibility: hidden; }}
 </style>
 """, unsafe_allow_html=True)
 
 
-# --------------------------------------------------------------------------
+# ============================================================================
 # DB helpers
-# --------------------------------------------------------------------------
+# ============================================================================
 @st.cache_data(ttl=30, show_spinner=False)
 def sql(q: str, params: tuple = ()) -> pd.DataFrame:
     try:
@@ -213,17 +328,30 @@ def fmt(n) -> str:
         return str(n)
 
 
-def zero(msg: str) -> None:
-    st.markdown(f"<div class='zero'>{msg}</div>", unsafe_allow_html=True)
+def empty_state(msg: str) -> None:
+    st.markdown(
+        f"<div class='banner neutral'>{msg}</div>",
+        unsafe_allow_html=True,
+    )
 
 
-def section(title: str) -> None:
-    st.markdown(f"## {title}")
+def hero_tile(label: str, value) -> str:
+    return (
+        f"<div class='hero-card'>"
+        f"<div class='label'>{label}</div>"
+        f"<div class='value'>{fmt(value)}</div>"
+        f"</div>"
+    )
 
 
-# --------------------------------------------------------------------------
-# Header strip
-# --------------------------------------------------------------------------
+def apply_plotly_theme(fig):
+    fig.update_layout(template=PLOTLY_TMPL)
+    return fig
+
+
+# ============================================================================
+# Header
+# ============================================================================
 now = datetime.now()
 
 try:
@@ -240,24 +368,38 @@ try:
         phase_label = "No active phase"
         phase_sub = ""
 except Exception:
-    phase_label = "—"
+    phase_label = "Operational"
     phase_sub = ""
 
-st.markdown(f"""
-<div class='header-strip'>
+col_h, col_m = st.columns([3, 2])
+with col_h:
+    st.markdown(
+        f"""
+<div class='hdr'>
     <span class='title'>HUNTER</span>
-    <span class='subtitle'>Cross-silo research instrument · John Malpass · UCD · 2026</span>
-    <span style='flex:1'></span>
-    <span class='tag'>{phase_label}</span>
-    <span class='subtitle'>{phase_sub}</span>
-    <span class='subtitle'>{now.strftime('%Y-%m-%d %H:%M:%S')}</span>
 </div>
-""", unsafe_allow_html=True)
+<div class='sub' style='color:{MUTED}; font-size:0.95rem; margin-top:-4px;'>
+    Cross-silo research instrument · John Malpass · University College Dublin · 2026
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+with col_m:
+    st.markdown(
+        f"""
+<div class='hdr-meta'>
+    <span class='phase'>{phase_label}</span>
+    <span class='time'>{phase_sub}</span>
+    <span class='time'>{now.strftime('%Y-%m-%d %H:%M:%S')}</span>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
-# --------------------------------------------------------------------------
-# Hero strip — seven counts
-# --------------------------------------------------------------------------
+# ============================================================================
+# Hero tiles (8 counts in 2 rows of 4)
+# ============================================================================
 facts_n = sql_one("SELECT COUNT(*) FROM raw_facts") or 0
 anomalies_n = sql_one("SELECT COUNT(*) FROM anomalies") or 0
 collisions_n = sql_one("SELECT COUNT(*) FROM collisions") or 0
@@ -268,94 +410,104 @@ survived_n = sql_one("SELECT COUNT(*) FROM hypotheses WHERE survived_kill=1") or
 findings_n = sql_one("SELECT COUNT(*) FROM findings") or 0
 cycles_n = sql_one("SELECT COUNT(*) FROM detected_cycles") or 0
 
-hero = [
-    ("Facts",       facts_n),
-    ("Anomalies",   anomalies_n),
-    ("Collisions",  collisions_n),
-    ("Chains",      chains_n),
-    ("Edges",       edges_n),
-    ("Hypotheses",  hypotheses_n),
-    ("Findings",    findings_n),
-    ("Cycles",      cycles_n),
-]
-cols = st.columns(len(hero))
-for c, (label, val) in zip(cols, hero):
-    c.metric(label, fmt(val))
-
-st.markdown("<hr>", unsafe_allow_html=True)
+row1_html = "<div class='hero-row'>" + "".join([
+    hero_tile("Facts", facts_n),
+    hero_tile("Anomalies", anomalies_n),
+    hero_tile("Collisions", collisions_n),
+    hero_tile("Chains", chains_n),
+]) + "</div>"
+row2_html = "<div class='hero-row'>" + "".join([
+    hero_tile("Causal edges", edges_n),
+    hero_tile("Hypotheses", hypotheses_n),
+    hero_tile("Findings (≥65)", findings_n),
+    hero_tile("Cycles", cycles_n),
+]) + "</div>"
+st.markdown(row1_html + row2_html, unsafe_allow_html=True)
 
 
-# --------------------------------------------------------------------------
+# ============================================================================
 # Tabs
-# --------------------------------------------------------------------------
+# ============================================================================
 tabs = st.tabs(["Overview", "Corpus", "Graph", "Hypotheses", "Study", "Operations"])
+
 
 # ==========================================================================
 # 1. OVERVIEW
 # ==========================================================================
 with tabs[0]:
-    c_left, c_right = st.columns([3, 2])
+    c_left, c_right = st.columns([3, 2], gap="large")
 
     with c_left:
-        section("Pipeline funnel")
-        funnel = pd.DataFrame([
+        st.markdown("## Pipeline funnel")
+        funnel_rows = pd.DataFrame([
             {"Stage": "1  Facts ingested",       "Count": facts_n,       "Yield": "—"},
             {"Stage": "2  Anomalies detected",   "Count": anomalies_n,
-             "Yield": f"{(anomalies_n/max(1,facts_n))*100:5.1f}% of facts"},
+             "Yield": f"{(anomalies_n/max(1,facts_n))*100:.1f}% of facts"},
             {"Stage": "3  Collisions formed",    "Count": collisions_n,
-             "Yield": f"{(collisions_n/max(1,anomalies_n))*100:5.1f}% of anomalies"},
+             "Yield": f"{(collisions_n/max(1,anomalies_n))*100:.1f}% of anomalies"},
             {"Stage": "4  Hypotheses formed",    "Count": hypotheses_n,
-             "Yield": f"{(hypotheses_n/max(1,collisions_n))*100:5.1f}% of collisions"},
+             "Yield": f"{(hypotheses_n/max(1,collisions_n))*100:.1f}% of collisions"},
             {"Stage": "5  Survived kill phase",  "Count": survived_n,
-             "Yield": f"{(survived_n/max(1,hypotheses_n))*100:5.1f}% of hypotheses"},
+             "Yield": f"{(survived_n/max(1,hypotheses_n))*100:.1f}% of hypotheses"},
             {"Stage": "6  Findings (score ≥ 65)", "Count": findings_n,
-             "Yield": f"{(findings_n/max(1,survived_n))*100:5.1f}% of survivors"},
+             "Yield": f"{(findings_n/max(1,survived_n))*100:.1f}% of survivors"},
         ])
-        st.dataframe(funnel, hide_index=True, use_container_width=True)
+        # Funnel bar chart (interactive)
+        fig_funnel = apply_plotly_theme(go.Figure(go.Bar(
+            x=funnel_rows["Count"], y=funnel_rows["Stage"],
+            orientation="h", marker=dict(color=ACCENT, line=dict(color=ACCENT2, width=0)),
+            text=funnel_rows["Count"].apply(fmt), textposition="outside",
+            hovertemplate="%{y}<br><b>%{x:,}</b> rows<extra></extra>",
+        )))
+        fig_funnel.update_layout(height=320, margin=dict(l=0, r=40, t=20, b=10),
+                                  yaxis=dict(autorange="reversed"), showlegend=False)
+        st.plotly_chart(fig_funnel, use_container_width=True, config={"displayModeBar": False})
 
-        section("Recent cycle activity")
+        with st.expander("Funnel table"):
+            st.dataframe(funnel_rows, hide_index=True, use_container_width=True)
+
+        st.markdown("## Recent cycle activity")
         recent = sql("""
             SELECT created_at, domain, status, error_message
-            FROM cycle_logs ORDER BY id DESC LIMIT 8
+            FROM cycle_logs ORDER BY id DESC LIMIT 10
         """)
         if not recent.empty:
             recent["created_at"] = pd.to_datetime(recent["created_at"])
+            lines = []
             for _, r in recent.iterrows():
-                cls = {"completed": "status-ok", "rate_limit": "status-warn"}.get(
-                    r["status"], "status-err"
-                )
+                cls = {"completed": "ok", "rate_limit": "warn"}.get(r["status"], "err")
                 t = r["created_at"].strftime("%m-%d %H:%M")
-                err = f" — {str(r.get('error_message') or '')[:80]}" if r.get("error_message") else ""
-                st.markdown(
-                    f"<div style='font-family: ui-monospace, monospace; "
-                    f"font-size: 0.8rem; padding: 2px 0;'>"
-                    f"<span style='color:{MUTED}'>{t}</span>  "
-                    f"<span class='{cls}'>{r['status']}</span>  "
-                    f"<span style='color:{TEXT}'>[{r['domain']}]</span>"
-                    f"<span style='color:{MUTED}'>{err}</span>"
-                    f"</div>", unsafe_allow_html=True
+                err = (str(r.get("error_message") or "")[:90]).replace("<", "&lt;")
+                lines.append(
+                    f"<div class='cycle-line'>"
+                    f"<span class='ts'>{t}</span>"
+                    f"<span class='{cls}'>{r['status']}</span>"
+                    f"<span class='domain'>[{r['domain']}]</span>"
+                    + (f"<span style='color:{MUTED}'> — {err}</span>" if err else "")
+                    + "</div>"
                 )
+            st.markdown("".join(lines), unsafe_allow_html=True)
         else:
-            zero("No cycles logged. Start with `python run.py live`.")
+            empty_state("No cycles logged. Start with `python run.py live`.")
 
     with c_right:
-        section("System state")
+        st.markdown("## System state")
         total_cycles = sql_one("SELECT COUNT(*) FROM cycle_logs") or 0
         last24 = sql_one("SELECT COUNT(*) FROM cycle_logs WHERE created_at >= datetime('now', '-1 day')") or 0
         last1h = sql_one("SELECT COUNT(*) FROM cycle_logs WHERE created_at >= datetime('now', '-1 hour')") or 0
         errors24 = sql_one("SELECT COUNT(*) FROM cycle_logs WHERE status != 'completed' AND created_at >= datetime('now', '-1 day')") or 0
         success_rate = (last24 - errors24) / max(1, last24)
 
-        m1, m2 = st.columns(2)
-        m1.metric("Cycles total", fmt(total_cycles))
-        m2.metric("Cycles 24h", fmt(last24))
-        m3, m4 = st.columns(2)
-        m3.metric("Cycles 1h", fmt(last1h))
-        m4.metric("24h success", f"{success_rate:.0%}",
-                  delta=f"{errors24} errors" if errors24 else "clean",
-                  delta_color="inverse" if errors24 else "normal")
+        r1c1, r1c2 = st.columns(2)
+        r1c1.metric("Cycles total", fmt(total_cycles))
+        r1c2.metric("Cycles 24h", fmt(last24))
+        r2c1, r2c2 = st.columns(2)
+        r2c1.metric("Cycles 1h", fmt(last1h))
+        r2c2.metric("24h success", f"{success_rate:.0%}",
+                    delta=f"{errors24} errors" if errors24 else "clean",
+                    delta_color="inverse" if errors24 else "normal")
 
-        section("Pre-registration integrity")
+        st.markdown("## Pre-registration integrity")
         if MANIFEST.exists():
             try:
                 m = json.loads(MANIFEST.read_text())
@@ -366,108 +518,117 @@ with tabs[0]:
                     ("Frozen facts", fmt(m.get("corpus_fact_count"))),
                     ("Code hash", m.get("code_hash", "—")),
                     ("Fact-ID hash", (m.get("corpus_fact_id_hash") or "—")[:16] + "…"),
-                    ("Locked", (m.get("created_at") or "—")[:16]),
+                    ("Locked at", (m.get("created_at") or "—")[:16]),
                 ]
-                for k, v in rows:
-                    st.markdown(
-                        f"<div style='display:flex; justify-content:space-between; "
-                        f"padding:3px 0; border-bottom:1px solid {BORDER}; font-size:0.82rem;'>"
-                        f"<span style='color:{MUTED}'>{k}</span>"
-                        f"<span style='font-family:ui-monospace,monospace; color:{TEXT}'>{v}</span>"
-                        f"</div>", unsafe_allow_html=True
-                    )
+                st.markdown(
+                    "".join(
+                        f"<div class='kv-row'><span class='k'>{k}</span><span class='v'>{v}</span></div>"
+                        for k, v in rows
+                    ),
+                    unsafe_allow_html=True,
+                )
 
                 try:
                     from preregister import verify_manifest  # noqa
                     v = verify_manifest()
                     if isinstance(v, dict) and v.get("status") == "ok":
                         st.markdown(
-                            f"<div style='margin-top:10px; padding:8px 12px; "
-                            f"border:1px solid {POSITIVE}; color:{POSITIVE}; "
-                            f"border-radius:3px; font-size:0.82rem;'>"
-                            f"Manifest verified · no drift detected</div>",
+                            "<div class='banner ok'>Manifest verified — no drift detected.</div>",
                             unsafe_allow_html=True,
                         )
                     else:
                         drift = (v or {}).get("drift", "unknown") if isinstance(v, dict) else "unknown"
                         st.markdown(
-                            f"<div style='margin-top:10px; padding:8px 12px; "
-                            f"border:1px solid {NEGATIVE}; color:{NEGATIVE}; "
-                            f"border-radius:3px; font-size:0.82rem;'>"
-                            f"Drift detected: {drift}</div>",
+                            f"<div class='banner err'>Drift detected: {drift}</div>",
                             unsafe_allow_html=True,
                         )
                 except Exception:
                     pass
             except Exception as e:
-                zero(f"Manifest unreadable: {e}")
+                empty_state(f"Manifest unreadable: {e}")
         else:
-            zero("No manifest. Run `python run.py preregister lock`.")
+            empty_state("No manifest. Run `python run.py preregister lock`.")
 
 
 # ==========================================================================
 # 2. CORPUS
 # ==========================================================================
 with tabs[1]:
-    section("Source-type distribution")
+    st.markdown("## Source-type distribution")
     sil = sql("""
         SELECT source_type AS silo, COUNT(*) AS n
         FROM raw_facts GROUP BY source_type ORDER BY n DESC
     """)
     if not sil.empty:
-        c1, c2 = st.columns([2, 1])
-        with c1:
-            st.bar_chart(sil.set_index("silo"), height=280)
-        with c2:
-            st.dataframe(sil, hide_index=True, use_container_width=True, height=300)
+        fig = apply_plotly_theme(px.bar(sil, x="silo", y="n",
+                                          color_discrete_sequence=[ACCENT]))
+        fig.update_layout(height=340, xaxis_title=None, yaxis_title="facts",
+                          showlegend=False, xaxis_tickangle=-35)
+        fig.update_traces(hovertemplate="<b>%{x}</b><br>%{y:,} facts<extra></extra>")
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
     else:
-        zero("No facts ingested yet.")
+        empty_state("No facts ingested yet.")
 
-    section("Country coverage")
-    cty = sql("""
-        SELECT country, COUNT(*) AS facts
-        FROM raw_facts WHERE country IS NOT NULL AND country != ''
-        GROUP BY country ORDER BY facts DESC LIMIT 20
-    """)
-    if not cty.empty:
-        st.dataframe(cty, hide_index=True, use_container_width=True, height=360)
+    st.markdown("## Fact browser")
+    c_search, c_filter = st.columns([3, 1])
+    with c_search:
+        search_q = st.text_input("Search facts (title + content)", "",
+                                 placeholder="e.g. CMBS, OSHA, pharma approval",
+                                 label_visibility="collapsed")
+    with c_filter:
+        silo_options = ["all"] + (sil["silo"].tolist() if not sil.empty else [])
+        silo_filter = st.selectbox("Silo", silo_options, label_visibility="collapsed")
+
+    where_parts, where_args = [], []
+    if silo_filter and silo_filter != "all":
+        where_parts.append("source_type = ?")
+        where_args.append(silo_filter)
+    if search_q.strip():
+        where_parts.append("(title LIKE ? OR raw_content LIKE ?)")
+        where_args.extend([f"%{search_q}%", f"%{search_q}%"])
+    where_clause = ("WHERE " + " AND ".join(where_parts)) if where_parts else ""
+
+    browse = sql(f"""
+        SELECT id, source_type AS silo, country, date_of_fact AS date,
+               substr(title, 1, 140) AS title
+        FROM raw_facts {where_clause}
+        ORDER BY COALESCE(date_of_fact, ingested_at) DESC
+        LIMIT 200
+    """, tuple(where_args))
+    if not browse.empty:
+        st.caption(f"{len(browse)} facts shown (limited to 200)")
+        st.dataframe(browse, hide_index=True, use_container_width=True, height=420)
     else:
-        zero("No country-tagged facts.")
+        empty_state("No facts match those filters.")
 
-    section("Model-field extractions")
-    mf_by_type = sql("""
+    st.markdown("## Model-field extractions")
+    mf = sql("""
         SELECT field_type, COUNT(*) AS n
         FROM fact_model_fields GROUP BY field_type ORDER BY n DESC
     """)
-    if not mf_by_type.empty:
-        c1, c2 = st.columns([1, 2])
-        c1.dataframe(mf_by_type, hide_index=True, use_container_width=True)
-        top_methodologies = sql("""
-            SELECT field_value AS methodology, COUNT(*) AS n
-            FROM fact_model_fields
-            WHERE field_type = 'methodology'
-            GROUP BY field_value ORDER BY n DESC LIMIT 20
-        """)
+    if not mf.empty:
+        c1, c2 = st.columns([1, 2], gap="large")
+        with c1:
+            fig = apply_plotly_theme(px.pie(mf, names="field_type", values="n",
+                                              color_discrete_sequence=CHART_SEQ,
+                                              hole=0.55))
+            fig.update_layout(height=300, margin=dict(l=0, r=0, t=10, b=10),
+                              showlegend=True, legend=dict(orientation="v", x=1.02, y=0.5))
+            fig.update_traces(hovertemplate="<b>%{label}</b><br>%{value:,} (%{percent})<extra></extra>")
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
         with c2:
-            st.markdown("### Top 20 methodologies named across facts")
-            if not top_methodologies.empty:
-                top_methodologies["methodology"] = top_methodologies["methodology"].str[:100]
-                st.dataframe(top_methodologies, hide_index=True, use_container_width=True)
+            top_meth = sql("""
+                SELECT field_value AS methodology, COUNT(*) AS n
+                FROM fact_model_fields
+                WHERE field_type = 'methodology'
+                GROUP BY field_value ORDER BY n DESC LIMIT 15
+            """)
+            st.markdown("### Top 15 methodologies named across facts")
+            if not top_meth.empty:
+                top_meth["methodology"] = top_meth["methodology"].str[:90]
+                st.dataframe(top_meth, hide_index=True, use_container_width=True)
     else:
-        zero("No model-field extractions yet.")
-
-    section("Anomaly sample")
-    anomalies = sql("""
-        SELECT a.id, a.weirdness_score, a.reasoning, r.source_type, r.title
-        FROM anomalies a LEFT JOIN raw_facts r ON r.id = a.raw_fact_id
-        ORDER BY a.weirdness_score DESC LIMIT 25
-    """)
-    if not anomalies.empty:
-        anomalies["title"] = anomalies["title"].astype(str).str[:80]
-        anomalies["reasoning"] = anomalies["reasoning"].astype(str).str[:140]
-        st.dataframe(anomalies, hide_index=True, use_container_width=True, height=420)
-    else:
-        zero("No anomalies flagged yet.")
+        empty_state("No model-field extractions yet.")
 
 
 # ==========================================================================
@@ -475,11 +636,11 @@ with tabs[1]:
 # ==========================================================================
 with tabs[2]:
     g_edges, g_chains, g_cycles, g_coll = st.tabs(
-        ["Causal edges", "Chains", "Cycles", "Collision map"]
+        ["Causal edges", "Chains", "Cycles", "Collision pairs"]
     )
 
     with g_edges:
-        section("Directed causal edges with named transmission pathway")
+        st.markdown("## Directed edges with named transmission pathway")
         edges = sql("""
             SELECT id, cause_node, effect_node, relationship_type,
                    confidence, source_type, domain
@@ -497,36 +658,53 @@ with tabs[2]:
             deg = deg_out.merge(deg_in, on="node", how="outer").fillna(0)
             deg["total"] = deg["out"] + deg["in_"]
             deg = deg.sort_values("total", ascending=False).head(15)
-            deg["node"] = deg["node"].str[:110]
+            deg["node_short"] = deg["node"].str[:80]
 
             st.markdown("### Top 15 hub nodes (by total degree)")
-            st.dataframe(deg, hide_index=True, use_container_width=True)
+            fig = apply_plotly_theme(go.Figure(go.Bar(
+                x=deg["total"], y=deg["node_short"], orientation="h",
+                marker=dict(color=ACCENT),
+                hovertemplate="<b>%{y}</b><br>in: %{customdata[0]}<br>out: %{customdata[1]}<br>total: %{x}<extra></extra>",
+                customdata=deg[["in_", "out"]].values,
+            )))
+            fig.update_layout(height=480, margin=dict(l=0, r=40, t=10, b=20),
+                              yaxis=dict(autorange="reversed"), showlegend=False)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
             with st.expander(f"All edges ({len(edges)})"):
-                edges["cause_node"] = edges["cause_node"].str[:90]
-                edges["effect_node"] = edges["effect_node"].str[:90]
-                st.dataframe(edges, hide_index=True, use_container_width=True, height=460)
+                edges_show = edges.copy()
+                edges_show["cause_node"] = edges_show["cause_node"].str[:90]
+                edges_show["effect_node"] = edges_show["effect_node"].str[:90]
+                st.dataframe(edges_show, hide_index=True, use_container_width=True, height=460)
         else:
-            zero("No edges yet. Edges form during ingest + collision cycles.")
+            empty_state("No edges yet. Edges form during ingest + collision cycles.")
 
     with g_chains:
-        section("Multi-link causal chains")
+        st.markdown("## Multi-link causal chains")
         chains = sql("""
             SELECT id, collision_id, chain_length, num_domains, domains_traversed
-            FROM chains ORDER BY chain_length DESC, created_at DESC LIMIT 100
+            FROM chains ORDER BY chain_length DESC, created_at DESC LIMIT 200
         """)
         if not chains.empty:
             m1, m2, m3 = st.columns(3)
             m1.metric("Chains total", fmt(len(chains)))
             m2.metric("Mean length", f"{chains['chain_length'].mean():.1f}")
             m3.metric("Max length", fmt(chains["chain_length"].max()))
-            st.bar_chart(chains["chain_length"].value_counts().sort_index(), height=180)
+
+            len_dist = chains["chain_length"].value_counts().sort_index().reset_index()
+            len_dist.columns = ["length", "n"]
+            fig = apply_plotly_theme(px.bar(len_dist, x="length", y="n",
+                                              color_discrete_sequence=[ACCENT]))
+            fig.update_layout(height=240, showlegend=False)
+            fig.update_traces(hovertemplate="length %{x}<br><b>%{y}</b> chains<extra></extra>")
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
             st.dataframe(chains, hide_index=True, use_container_width=True, height=360)
         else:
-            zero("No chains yet.")
+            empty_state("No chains yet.")
 
     with g_cycles:
-        section("Detected epistemic cycles")
+        st.markdown("## Detected epistemic cycles")
         st.caption("Closed loops A → B → … → A identified by Tarjan SCC over the causal graph.")
         cycles = sql("""
             SELECT id, cycle_type, nodes, domains,
@@ -536,11 +714,15 @@ with tabs[2]:
             ORDER BY reinforcement_strength DESC
         """)
         if not cycles.empty:
-            tcount = cycles["cycle_type"].value_counts()
-            c1, c2 = st.columns([1, 2])
-            c1.dataframe(tcount.reset_index().rename(
-                columns={"index": "type", "cycle_type": "n"}),
-                hide_index=True, use_container_width=True)
+            tcount = cycles["cycle_type"].value_counts().reset_index()
+            tcount.columns = ["type", "n"]
+            c1, c2 = st.columns([1, 2], gap="large")
+            with c1:
+                fig = apply_plotly_theme(px.bar(tcount, x="n", y="type", orientation="h",
+                                                  color_discrete_sequence=[ACCENT]))
+                fig.update_layout(height=260, showlegend=False,
+                                  yaxis=dict(autorange="reversed"))
+                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
             with c2:
                 st.markdown("### Cycle details")
                 for _, r in cycles.iterrows():
@@ -566,10 +748,10 @@ with tabs[2]:
                             f"est persistence {r.get('persistence_estimate') or 0:.0f}d"
                         )
         else:
-            zero("No cycles detected. Run `python cycle_detector.py run`.")
+            empty_state("No cycles detected. Run `python cycle_detector.py run`.")
 
     with g_coll:
-        section("Cross-silo collision pairs (top 20)")
+        st.markdown("## Cross-silo collision pairs")
         fire_df = sql("""
             SELECT source_types FROM collisions
             WHERE source_types IS NOT NULL AND source_types != ''
@@ -590,12 +772,19 @@ with tabs[2]:
                     pair_counts[key] = pair_counts.get(key, 0) + 1
             if pair_counts:
                 top = pd.DataFrame([
-                    {"Silo pair": k, "Collisions": v}
-                    for k, v in sorted(pair_counts.items(), key=lambda x: -x[1])[:20]
+                    {"pair": k, "n": v}
+                    for k, v in sorted(pair_counts.items(), key=lambda x: -x[1])[:25]
                 ])
-                st.dataframe(top, hide_index=True, use_container_width=True, height=520)
+                fig = apply_plotly_theme(go.Figure(go.Bar(
+                    x=top["n"], y=top["pair"], orientation="h",
+                    marker=dict(color=ACCENT),
+                    hovertemplate="<b>%{y}</b><br>%{x} collisions<extra></extra>",
+                )))
+                fig.update_layout(height=620, margin=dict(l=0, r=40, t=10, b=10),
+                                  yaxis=dict(autorange="reversed"), showlegend=False)
+                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
         else:
-            zero("No collisions yet.")
+            empty_state("No collisions yet.")
 
 
 # ==========================================================================
@@ -607,38 +796,54 @@ with tabs[3]:
     )
 
     with h_top:
-        section("Top-scoring hypotheses (score ≥ 65)")
+        st.markdown("## Top-scoring findings (diamond ≥ 65)")
         diamonds = sql("""
             SELECT id, title, score, domain, confidence, summary, created_at
-            FROM findings ORDER BY score DESC LIMIT 20
+            FROM findings ORDER BY score DESC LIMIT 100
         """)
         if not diamonds.empty:
-            c1, c2 = st.columns([1, 3])
-            with c1:
-                st.markdown("### Score distribution")
-                hist = diamonds["score"].value_counts().sort_index()
-                st.bar_chart(hist, height=220)
-            with c2:
-                for _, r in diamonds.head(12).iterrows():
-                    score = int(r["score"])
-                    st.markdown(f"""
+            c_thr, c_dom = st.columns([1, 1])
+            with c_thr:
+                min_score = st.slider("Minimum score", 65, 100, 65, 1)
+            with c_dom:
+                dom_opts = ["all"] + sorted(diamonds["domain"].dropna().unique().tolist())
+                dom_filter = st.selectbox("Domain", dom_opts, key="diamond_dom")
+
+            filt = diamonds[diamonds["score"] >= min_score]
+            if dom_filter != "all":
+                filt = filt[filt["domain"] == dom_filter]
+            st.caption(f"{len(filt)} findings match")
+
+            if not filt.empty:
+                c1, c2 = st.columns([1, 3], gap="large")
+                with c1:
+                    hist = filt["score"].value_counts().sort_index().reset_index()
+                    hist.columns = ["score", "n"]
+                    fig = apply_plotly_theme(px.bar(hist, x="score", y="n",
+                                                      color_discrete_sequence=[ACCENT]))
+                    fig.update_layout(height=260, showlegend=False)
+                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+                with c2:
+                    for _, r in filt.head(15).iterrows():
+                        score = int(r["score"])
+                        st.markdown(f"""
 <div class='row-item'>
-    <span class='score'>{score}</span>
-    <strong>{(r['title'] or '')[:140]}</strong>
+    <span class='score-pill'>{score}</span>
+    <span class='title'>{(r['title'] or '')[:140]}</span>
     <div class='meta'>{r['domain']} · {r['confidence']} · {str(r['created_at'])[:10]}</div>
     <div class='body'>{(r['summary'] or '')[:320]}</div>
 </div>
-                    """, unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
         else:
-            zero("No findings yet. Entries appear once HUNTER has run collision cycles "
-                 "and produced hypotheses scoring ≥ 65.")
+            empty_state("No findings yet. Entries appear once HUNTER has run collision cycles "
+                         "and produced hypotheses scoring ≥ 65.")
 
     with h_all:
-        section("All hypotheses with completed adversarial review")
+        st.markdown("## All hypotheses with completed adversarial review")
         all_h = sql("""
             SELECT h.id, h.diamond_score AS score, h.confidence,
                    h.survived_kill, c.num_domains, c.source_types,
-                   substr(h.hypothesis_text, 1, 200) AS thesis,
+                   substr(h.hypothesis_text, 1, 220) AS thesis,
                    h.time_window_days AS window_d,
                    h.created_at
             FROM hypotheses h LEFT JOIN collisions c ON c.id = h.collision_id
@@ -650,12 +855,33 @@ with tabs[3]:
             m2.metric("Survived", fmt(int((all_h["survived_kill"] == 1).sum())))
             m3.metric("Killed", fmt(int((all_h["survived_kill"] == 0).sum())))
             m4.metric("Mean score", f"{all_h['score'].mean():.1f}")
-            st.dataframe(all_h, hide_index=True, use_container_width=True, height=500)
+
+            c_surv, c_nd = st.columns([1, 1])
+            with c_surv:
+                surv_filter = st.selectbox("Outcome",
+                                            ["all", "survived", "killed"],
+                                            key="hyp_surv")
+            with c_nd:
+                nd_filter = st.selectbox("Num silos",
+                                          ["all"] + sorted(all_h["num_domains"].dropna().unique().tolist()),
+                                          key="hyp_nd")
+            filt = all_h.copy()
+            if surv_filter == "survived":
+                filt = filt[filt["survived_kill"] == 1]
+            elif surv_filter == "killed":
+                filt = filt[filt["survived_kill"] == 0]
+            if nd_filter != "all":
+                filt = filt[filt["num_domains"] == nd_filter]
+            st.caption(f"{len(filt)} hypotheses shown")
+            st.dataframe(filt, hide_index=True, use_container_width=True, height=520)
         else:
-            zero("No hypotheses yet.")
+            empty_state("No hypotheses yet.")
 
     with h_portfolio:
-        section("Paper-trade positions (internal, not in Zenodo release)")
+        st.markdown("## Paper-trade positions")
+        st.caption("Internal view only. Paper-trade tables are intentionally "
+                    "withheld from the Zenodo v1 release; they're shown here so you "
+                    "can track the private book.")
         positions = sql("""
             SELECT id, ticker, direction, entry_price, current_price,
                    pnl_pct, pnl_gbp, diamond_score, confidence, status,
@@ -663,9 +889,7 @@ with tabs[3]:
             FROM portfolio_positions WHERE ticker != 'LOGGED'
         """)
         if positions.empty:
-            zero("No paper-trade positions. The v1 Zenodo release intentionally "
-                 "withholds these tables; see docs/LIMITATIONS.md and the summer "
-                 "pre-registration for the provenance regime that applies to v2.")
+            empty_state("No paper-trade positions.")
         else:
             opos = positions[positions["status"] == "open"]
             cpos = positions[positions["status"] == "closed"]
@@ -686,17 +910,16 @@ with tabs[3]:
                              "pnl_pct", "pnl_gbp", "diamond_score", "entry_date"]]
                 st.dataframe(show, hide_index=True, use_container_width=True)
             else:
-                zero("No open positions.")
+                empty_state("No open positions.")
 
     with h_board:
-        section("Public prediction board")
+        st.markdown("## Public prediction board")
         st.caption("Every hypothesis scoring ≥ 65 posts with asset, direction, and resolution date. "
-                   "Board is deliberately empty until the pre-registered summer run begins June 1.")
+                    "Board is deliberately empty until the pre-registered summer run begins June 1.")
         if PRED_HTML.exists():
             st.markdown(
-                f"<div class='zero'>Live board deployed at "
-                f"<code>{PRED_HTML.relative_to(ROOT)}</code> → "
-                f"<code>johnmalpass.github.io/hunter-research/</code></div>",
+                "<div class='banner ok'>Board deployed → "
+                "<code>johnmalpass.github.io/hunter-research/</code></div>",
                 unsafe_allow_html=True,
             )
         try:
@@ -733,11 +956,11 @@ with tabs[4]:
     )
 
     with s_hyps:
-        section("Pre-registered hypothesis tests (frontier)")
+        st.markdown("## Pre-registered hypothesis tests")
         ft = sql("""
             SELECT hypothesis_id, hypothesis_name, supports_hypothesis,
                    observation_value, measured_at
-            FROM frontier_test_results ORDER BY measured_at DESC LIMIT 50
+            FROM frontier_test_results ORDER BY measured_at DESC LIMIT 100
         """)
         if not ft.empty:
             latest = ft.drop_duplicates(subset=["hypothesis_id"], keep="first")
@@ -745,12 +968,12 @@ with tabs[4]:
             m1.metric("Tests measured", fmt(len(latest)))
             m2.metric("Supported", fmt(int((latest["supports_hypothesis"] == 1).sum())))
             m3.metric("Refuted", fmt(int((latest["supports_hypothesis"] == 0).sum())))
-            st.dataframe(latest, hide_index=True, use_container_width=True, height=420)
+            st.dataframe(latest, hide_index=True, use_container_width=True, height=440)
         else:
-            zero("No frontier-test results. Run `python run.py frontier all`.")
+            empty_state("No frontier-test results. Run `python run.py frontier all`.")
 
     with s_tests:
-        section("1. Collision formula predictiveness")
+        st.markdown("## 1. Collision formula predictiveness")
         fv = sql("SELECT * FROM formula_validation ORDER BY date DESC LIMIT 1")
         if not fv.empty:
             row = fv.iloc[0]
@@ -759,20 +982,20 @@ with tabs[4]:
             c2.metric("Spearman ρ", f"{row.get('spearman_rho', 0):+.3f}")
             c3.metric("p-value", f"{row.get('p_value', 0):.3f}")
         else:
-            zero("Run `python formula_validator.py write`.")
+            empty_state("Run `python formula_validator.py write`.")
 
-        section("2. Measured reinforcement and correction per silo")
+        st.markdown("## 2. Measured reinforcement and correction per silo")
         measured = sql("""
             SELECT source_type AS silo, reinforcement_measured, correction_measured,
                    persistence_ratio_measured, n_facts
             FROM measured_domain_params ORDER BY persistence_ratio_measured DESC
         """)
         if not measured.empty:
-            st.dataframe(measured, hide_index=True, use_container_width=True, height=320)
+            st.dataframe(measured, hide_index=True, use_container_width=True, height=340)
         else:
-            zero("Run `python reinforcement_measurer.py write`.")
+            empty_state("Run `python reinforcement_measurer.py write`.")
 
-        section("3. Half-life per silo vs 120-day framework prediction")
+        st.markdown("## 3. Half-life per silo vs framework prediction")
         hl = sql("""
             SELECT source_type AS silo, half_life_days, n_correction_events, n_observations
             FROM halflife_estimates ORDER BY half_life_days
@@ -780,9 +1003,9 @@ with tabs[4]:
         if not hl.empty:
             st.dataframe(hl, hide_index=True, use_container_width=True, height=320)
         else:
-            zero("Run `python halflife_estimator.py write`.")
+            empty_state("Run `python halflife_estimator.py write`.")
 
-        section("4. Narrative strength vs kill survival")
+        st.markdown("## 4. Narrative strength vs kill survival")
         ns = sql("""
             SELECT narrative_strength, h.survived_kill, h.diamond_score
             FROM narrative_scores ns JOIN hypotheses h ON h.id = ns.hypothesis_id
@@ -799,10 +1022,10 @@ with tabs[4]:
                 c3.metric("Uplift",
                           f"{(high['survived_kill'].mean() - low['survived_kill'].mean()):+.1%}")
         else:
-            zero("Run `python narrative_detector.py write`.")
+            empty_state("Run `python narrative_detector.py write`.")
 
     with s_layers:
-        section("13-layer theory-evidence matrix")
+        st.markdown("## 13-layer theory-evidence matrix")
         layer_names = {
             1: "Translation Loss",      2: "Attention Topology",
             3: "Question Gap",          4: "Phase Transition",
@@ -847,13 +1070,11 @@ with tabs[5]:
     )
 
     with o_agents:
-        section("Theory-layer agents")
+        st.markdown("## Theory-layer agents")
         st.caption("Seven agents attached to the orchestrator. Each writes its most "
-                   "recent output into the tables below. Idle does not mean broken; "
-                   "it means the agent's next scheduled slot hasn't arrived yet.")
+                    "recent output into the tables shown. `idle` does not mean broken — "
+                    "it means the agent's next scheduled slot hasn't arrived yet.")
 
-        # Last-run check for each agent's output table
-        agent_rows = []
         agent_specs = [
             ("TheoryTelemetry",           "theory_evidence",       "created_at", "per cycle"),
             ("DecayTracker",              "decay_tracking",        "recorded_at", "daily"),
@@ -863,18 +1084,19 @@ with tabs[5]:
             ("BacktestReconciler",        "backtest_results",      "created_at", "weekly"),
             ("ResidualEstimator",         "residual_tam",          "measured_at", "monthly"),
         ]
+        agent_rows = []
         for name, table, ts_col, cadence in agent_specs:
             last_ts = sql_one(f"SELECT {ts_col} FROM {table} ORDER BY {ts_col} DESC LIMIT 1")
             n_rows = sql_one(f"SELECT COUNT(*) FROM {table}") or 0
             if last_ts:
                 try:
                     dt_last = pd.to_datetime(last_ts).to_pydatetime()
-                    age = (datetime.now() - dt_last).total_seconds() / 3600
-                    if age < 24:
+                    age_h = (datetime.now() - dt_last).total_seconds() / 3600
+                    if age_h < 24:
                         state = "active"
-                    elif age < 24 * 7:
+                    elif age_h < 24 * 7:
                         state = "recent"
-                    elif age < 24 * 30:
+                    elif age_h < 24 * 30:
                         state = "stale"
                     else:
                         state = "idle"
@@ -895,20 +1117,20 @@ with tabs[5]:
             })
         st.dataframe(pd.DataFrame(agent_rows), hide_index=True, use_container_width=True)
 
-        section("Orchestrator scheduling")
+        st.markdown("## Orchestrator scheduling")
         st.markdown(f"""
-<div class='zero'>
-Theory agents run on fixed intervals from <code>orchestrator.py</code>.<br>
-<code>DecayTracker</code> daily at 24h rollover · <code>CycleDetector</code>,
+<div class='banner neutral'>
+Theory agents run on fixed intervals from <code>orchestrator.py</code>.
+<code>DecayTracker</code> runs daily at the 24 h rollover. <code>CycleDetector</code>,
 <code>CollisionFormulaValidator</code>, <code>ChainDepthProfiler</code>,
-<code>BacktestReconciler</code> weekly on Sundays · <code>ResidualEstimator</code>
-monthly on the 1st. <code>TheoryTelemetry</code> runs inline during each
+<code>BacktestReconciler</code> run weekly on Sundays. <code>ResidualEstimator</code>
+runs monthly on the 1st. <code>TheoryTelemetry</code> runs inline during each
 collision cycle. Start the orchestrator with <code>python run.py live</code>.
 </div>
         """, unsafe_allow_html=True)
 
     with o_runs:
-        section("Cycle history (last 100)")
+        st.markdown("## Cycle history (last 100)")
         runs = sql("""
             SELECT id, datetime(created_at) AS t, domain, status,
                    tokens_used, duration_seconds, error_message
@@ -917,26 +1139,41 @@ collision cycle. Start the orchestrator with <code>python run.py live</code>.
         if not runs.empty:
             runs["t"] = pd.to_datetime(runs["t"])
             runs["hour"] = runs["t"].dt.floor("h")
-            hourly = runs.groupby(["hour", "status"]).size().unstack(fill_value=0)
-            st.markdown("### Cycles per hour")
-            st.line_chart(hourly, height=200)
+            hourly = runs.groupby(["hour", "status"]).size().unstack(fill_value=0).reset_index()
+            # Plotly stacked area
+            fig = go.Figure()
+            for status_col in [c for c in hourly.columns if c != "hour"]:
+                color = {"completed": SUCCESS, "rate_limit": WARNING}.get(status_col, ERROR)
+                fig.add_trace(go.Scatter(
+                    x=hourly["hour"], y=hourly[status_col],
+                    stackgroup="one", name=status_col,
+                    line=dict(width=0), fillcolor=color,
+                    hovertemplate=f"<b>{status_col}</b><br>%{{x}}<br>%{{y}} cycles<extra></extra>",
+                ))
+            apply_plotly_theme(fig)
+            fig.update_layout(height=260, margin=dict(l=0, r=10, t=20, b=10),
+                              xaxis_title=None, yaxis_title="cycles")
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
             st.markdown("### Cycles (most recent 50)")
             show = runs.head(50)[["t", "domain", "status", "tokens_used",
                                     "duration_seconds", "error_message"]]
             st.dataframe(show, hide_index=True, use_container_width=True, height=420)
         else:
-            zero("No runs yet.")
+            empty_state("No runs yet.")
 
     with o_goals:
-        section("Self-improvement goals")
+        st.markdown("## Self-improvement goals")
         if GOALS.exists():
             g = json.loads(GOALS.read_text())
             idx = g.get("current_goal_index", 0)
             goals = g.get("goals", [])
             if idx < len(goals):
                 current = goals[idx]
-                st.markdown(f"**Active goal:** {current.get('goal')}")
+                st.markdown(
+                    f"<div class='banner ok'><b>Active goal:</b> {current.get('goal')}</div>",
+                    unsafe_allow_html=True,
+                )
                 st.caption(f"Target: {current.get('target')} · Measure: {current.get('measure')}")
                 subgoals = current.get("subgoals", [])
                 if subgoals:
@@ -946,18 +1183,19 @@ collision cycle. Start the orchestrator with <code>python run.py live</code>.
             with st.expander(f"All goals ({len(goals)})"):
                 for i, gl in enumerate(goals):
                     marker = "done" if i < idx else ("active" if i == idx else "queued")
+                    color = {"done": MUTED, "active": ACCENT, "queued": MUTED2}[marker]
                     st.markdown(
-                        f"<div style='display:flex; gap:10px; padding:2px 0; "
-                        f"font-size:0.82rem;'>"
-                        f"<span style='color:{MUTED}; width:60px'>{marker}</span>"
-                        f"<span>#{i} {gl.get('goal')}</span></div>",
+                        f"<div style='display:flex; gap:12px; padding:4px 0; font-size:0.88rem;'>"
+                        f"<span style='color:{color}; width:64px; font-size:0.76rem; "
+                        f"text-transform:uppercase; letter-spacing:0.08em;'>{marker}</span>"
+                        f"<span>#{i}  {gl.get('goal')}</span></div>",
                         unsafe_allow_html=True,
                     )
         else:
-            zero("No goals.json found.")
+            empty_state("No goals.json found.")
 
     with o_reports:
-        section("Overseer reports (most recent 5)")
+        st.markdown("## Overseer reports (most recent 5)")
         overseer = sql("""
             SELECT created_at, substr(report_text, 1, 600) AS preview
             FROM overseer_reports ORDER BY id DESC LIMIT 5
@@ -967,31 +1205,33 @@ collision cycle. Start the orchestrator with <code>python run.py live</code>.
                 with st.expander(str(r["created_at"])[:16]):
                     st.markdown(r["preview"])
         else:
-            zero("No overseer reports. Run `python targeting.py`.")
+            empty_state("No overseer reports. Run `python targeting.py`.")
 
-        section("Daily summaries")
+        st.markdown("## Daily summaries")
         daily = sql("""
             SELECT summary_date, total_cycles, total_findings, diamonds_found,
                    most_promising_thread
             FROM daily_summaries ORDER BY summary_date DESC LIMIT 14
         """)
         if not daily.empty:
-            st.dataframe(daily, hide_index=True, use_container_width=True, height=420)
+            st.dataframe(daily, hide_index=True, use_container_width=True, height=400)
         else:
-            zero("No daily summaries yet.")
+            empty_state("No daily summaries yet.")
 
 
-# --------------------------------------------------------------------------
+# ============================================================================
 # Footer
-# --------------------------------------------------------------------------
+# ============================================================================
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown(
-    f"<div style='color:{MUTED}; font-size:0.75rem; text-align:center;'>"
+    f"<div style='color:{MUTED}; font-size:0.8rem; text-align:center; "
+    f"padding: 16px 0;'>"
     f"HUNTER · {now.strftime('%Y-%m-%d %H:%M:%S')} · John Malpass · "
     f"University College Dublin · "
     f"<a href='https://github.com/Johnmalpass/hunter-research' "
-    f"style='color:{ACCENT}; text-decoration:none;'>repo</a> · "
+    f"style='color:{ACCENT}; text-decoration:none;'>github</a> · "
     f"<a href='https://doi.org/10.5281/zenodo.19667567' "
-    f"style='color:{ACCENT}; text-decoration:none;'>corpus DOI</a></div>",
+    f"style='color:{ACCENT}; text-decoration:none;'>corpus DOI</a>"
+    f"</div>",
     unsafe_allow_html=True,
 )
