@@ -1,5 +1,5 @@
 # The Gap Between Worlds
-### How a nineteen-year-old at UCD built a machine that reads across the rooms of finance, and what it found in there
+### How a second-year undergraduate at UCD built a machine that reads across the rooms of finance, and what it found in there
 
 ---
 
@@ -25,7 +25,7 @@ No single person walks through all those rooms. So the facts are public, and the
 
 ## 2. Enter John
 
-John Malpass is nineteen. He's in his second year of a BSc Economics at University College Dublin. Depending on the day, he is either writing code, reading papers, or sitting in a lecture theatre trying to take useful notes about something he's usually already read the Cliff Notes for.
+John Malpass is in his second year of a BSc Economics at University College Dublin. Depending on the day, he is either writing code, reading papers, or sitting in a lecture theatre trying to take useful notes about something he's usually already read the Cliff Notes for.
 
 In November 2025 he had a thought. It was a simple one, as all good thoughts are.
 
@@ -151,7 +151,7 @@ A closed loop. A *self-reinforcing error*. Each node's mistake gets used as an i
 
 In economics the canonical example of such a loop is informal: we talk about "echo chambers" or "consensus" as if they were social phenomena. HUNTER shows you the actual circuit diagram. You can point at each node; each edge has a named filename; each loop closes in a specific, mechanistic way.
 
-The CMBS cycle is a real object. You could build a trading strategy around it. More importantly: you can *see* it. No one else can.
+The CMBS cycle is a detected closed loop in the current corpus. Whether it persists uncorrected in the market is the thing the summer study measures. You can *see* the loop; whether it's exploitable is an empirical question not yet answered.
 
 ---
 
@@ -192,7 +192,7 @@ You can read HUNTER as three different things, depending on what you care about.
 
 **1. A piece of science.** HUNTER provides the first direct empirical measurement of a predicted-but-never-quantified phenomenon: structural residual from professional specialization. The immune-system mechanism is a formal extension of Shleifer-Vishny. The non-zero-residual claim is a strengthening of Grossman-Stiglitz. These are minor-but-real contributions to academic economics, even by non-undergraduate standards.
 
-**2. A piece of infrastructure.** HUNTER has built something that looks very much like what Palantir built for defense intelligence: a structured knowledge graph, with named causal edges and named transmission pathways, of how markets actually operate at cross-silo level. 11,835 entities. 171 edges. 6,670 methodology/assumption/practitioner triples. 52 chains. 9 cycles. No one else has this for markets. It is a licensable asset in the way that Palantir's government graphs are licensable assets, and Palantir is a $250B company.
+**2. A piece of infrastructure.** HUNTER has built something that looks very much like what Palantir built for defense intelligence: a structured knowledge graph, with named causal edges and named transmission pathways, of how markets actually operate at cross-silo level. 11,835 entities. 171 edges. 6,670 methodology/assumption/practitioner triples. 52 chains. 9 cycles. No one else has this for markets. It is a licensable asset in the way that Palantir's government graphs are licensable assets.
 
 **3. A piece of weaponry.** HUNTER produces trading signals. Every hypothesis with a diamond score of 65 or higher is an *actionable* claim with a named asset, direction, and resolution date. These go on the public prediction board. They accumulate into a track record. The track record either shows HUNTER is right more often than a coin flip, or it doesn't. It's on the ledger, publicly. If it's right, it's a weapon worth paying for. If it's wrong, the public record documents a null result. Both are publishable outcomes.
 
@@ -224,7 +224,7 @@ This is how a generation of thinkers becomes a generation of thinkers. By being 
 
 ## 10. Come and watch
 
-HUNTER is live. As of April 2026, the public prediction board has 11 pending predictions with resolution dates between July 2026 and April 2027. A 12-week pre-registered study runs this summer — corpus frozen, code hashed, decision rules locked, three null baselines committed, McNemar paired-comparison primary endpoint, BH-corrected FDR at q=0.10.
+HUNTER is live. As of launch the public prediction board is deliberately empty; the pre-registered summer pipeline begins filling it June 1 with hypotheses surviving the upgraded kill gauntlet against the frozen corpus. A 12-week pre-registered study runs through August — corpus frozen, code hashed, decision rules locked, three null baselines committed, paired-bootstrap primary endpoint, D − A > 0 at p < 0.05 as the primary criterion.
 
 The corpus — 12,030 facts across 18 silos, 30,967 entity index, 6,670 model-field extractions, 171-edge causal graph — is being released on Zenodo with a DOI. The methods paper is going up on SSRN. The code is going on GitHub under MIT license. The methodology brief is public. Nothing is hidden.
 
@@ -240,6 +240,6 @@ The fun part starts now.
 
 *Written to be read aloud to a friend in 15 minutes, in the voice of someone who has been quietly impressed and wanted to tell you why. If you've read this far, say hi: john at [domain].*
 
-*Paper 0 (methods): [SSRN link pending]. Paper 2 (immune system mechanism): [under review]. Prediction board: [public URL]. Corpus: [Zenodo DOI].*
+*Paper 0 (methods): [SSRN link pending]. Paper 2 (immune system mechanism, in draft). Prediction board: [public URL]. Corpus: [Zenodo DOI].*
 
 *John Malpass · University College Dublin · 2026*

@@ -14,76 +14,111 @@
   --win: #4ade80;
   --loss: #f87171;
   --pending: #60a5fa;
-  --expired: #a78bfa;
 }
 * { box-sizing: border-box; }
 body {
-  margin: 0; padding: 40px 24px;
+  margin: 0; padding: 48px 24px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg); color: var(--text);
-  line-height: 1.5;
+  line-height: 1.55;
 }
-.container { max-width: 1040px; margin: 0 auto; }
+.container { max-width: 760px; margin: 0 auto; }
 header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
-header h1 { margin: 0 0 8px 0; font-size: 1.8rem; color: var(--accent); }
+header h1 { margin: 0 0 8px 0; font-size: 1.9rem; color: var(--accent); }
 header .sub { color: var(--muted); font-size: 0.95rem; }
-header .manifesto { margin-top: 16px; padding: 16px; background: var(--card); border-radius: 8px; border-left: 3px solid var(--accent); font-size: 0.9rem; }
-.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
-.stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-.stat .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-.stat .value { font-size: 1.6rem; font-weight: 600; margin-top: 4px; }
-.prediction {
-  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-  padding: 20px; margin-bottom: 16px;
+.status-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
 }
-.prediction .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; }
-.prediction .header .id { font-family: ui-monospace, monospace; color: var(--muted); font-size: 0.85rem; }
-.prediction .header .status { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.status.pending { background: rgba(96,165,250,0.15); color: var(--pending); border: 1px solid var(--pending); }
-.status.resolved_win { background: rgba(74,222,128,0.15); color: var(--win); border: 1px solid var(--win); }
-.status.resolved_loss { background: rgba(248,113,113,0.15); color: var(--loss); border: 1px solid var(--loss); }
-.status.resolved_partial { background: rgba(255,178,63,0.15); color: var(--accent); border: 1px solid var(--accent); }
-.status.expired_unresolved { background: rgba(167,139,250,0.15); color: var(--expired); border: 1px solid var(--expired); }
-.prediction .thesis { font-weight: 500; margin-bottom: 12px; }
-.prediction .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
-.prediction .meta div span { display: block; color: var(--text); font-weight: 500; margin-top: 2px; }
-.prediction .resolution { margin-top: 12px; padding: 12px; background: rgba(74,222,128,0.06); border-left: 2px solid var(--win); border-radius: 4px; font-size: 0.9rem; }
-.prediction.loss .resolution { background: rgba(248,113,113,0.06); border-left-color: var(--loss); }
-.prediction .countdown { font-family: ui-monospace, monospace; font-size: 0.85rem; }
-.positive { color: var(--pending); }
-.past { color: var(--loss); }
-footer { margin-top: 60px; color: var(--muted); font-size: 0.8rem; text-align: center; border-top: 1px solid var(--border); padding-top: 24px; }
-footer a { color: var(--accent); text-decoration: none; }
-details summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
-details[open] summary { margin-bottom: 8px; }
+.status-card h2 { margin: 0 0 12px 0; font-size: 1.1rem; color: var(--accent); }
+.countdown {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(255,178,63,0.06);
+  border-radius: 6px;
+}
+.countdown .unit { flex: 1; text-align: center; }
+.countdown .value { font-size: 2.2rem; font-weight: 600; color: var(--accent); font-family: ui-monospace, monospace; }
+.countdown .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 24px 0; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.stat .label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat .value { font-size: 1.5rem; font-weight: 600; margin-top: 4px; font-family: ui-monospace, monospace; }
+.links { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+.links h3 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 12px 0; }
+.links a { color: var(--accent); text-decoration: none; display: block; padding: 6px 0; }
+.links a:hover { text-decoration: underline; }
+footer { margin-top: 48px; color: var(--muted); font-size: 0.82rem; text-align: center; border-top: 1px solid var(--border); padding-top: 20px; }
 </style>
 </head><body>
 <div class="container">
 
 <header>
   <h1>HUNTER — Public Prediction Board</h1>
-  <div class="sub">Every surviving hypothesis with a target-date resolution. Win or loss, both go on the ledger.</div>
-  <div class="manifesto">
-    <strong>Rules of the board:</strong> Every prediction is posted before its outcome is known. Resolution dates are fixed at time of posting (thesis window + posting date). Outcomes are resolved against public evidence only — no retroactive adjustment. Failures stay visible forever. This is an undergraduate research project in the <em>compositional alpha</em> framework. Methodology: <a href="methodology.html">methodology brief</a>. Code: <a href="https://github.com/" target="_blank">GitHub</a>. Pre-registration: <code>preregistration.json</code> with locked code hash.
-  </div>
+  <div class="sub">Cross-silo compositional hypotheses, posted before resolution. Win or loss, both stay on the ledger.</div>
 </header>
 
+<div class="status-card">
+  <h2>Status: deliberately empty until 2026-06-01</h2>
+  <p>The board launched on 2026-04-28. It does not fill from launch. It fills from the start of the pre-registered summer study. Every hypothesis scoring ≥ 65 from the upgraded summer pipeline against the frozen pre-cutoff corpus will be posted here with an asset name, a direction, and a fixed resolution date. Failures will stay visible forever. This is the track-record mechanism; the launch-day emptiness is a feature, not a bug.</p>
+  <div class="countdown" id="countdown">
+    <div class="unit"><div class="value" id="cd-days">—</div><div class="label">days</div></div>
+    <div class="unit"><div class="value" id="cd-hours">—</div><div class="label">hours</div></div>
+    <div class="unit"><div class="value" id="cd-minutes">—</div><div class="label">minutes</div></div>
+    <div class="unit"><div class="value" id="cd-seconds">—</div><div class="label">seconds</div></div>
+  </div>
+  <p style="color:var(--muted);font-size:0.9rem;margin:8px 0 0 0;">Until the summer pipeline begins posting (June 1, 2026 · 00:00 UTC).</p>
+</div>
+
 <section class="summary">
-  <div class="stat"><div class="label">Total posted</div><div class="value">0</div></div>
+  <div class="stat"><div class="label">Posted</div><div class="value">0</div></div>
   <div class="stat"><div class="label">Pending</div><div class="value">0</div></div>
   <div class="stat"><div class="label">Resolved</div><div class="value">0</div></div>
   <div class="stat"><div class="label">Hit rate</div><div class="value">—</div></div>
-  <div class="stat"><div class="label">Brier score</div><div class="value">—</div></div>
-  <div class="stat"><div class="label">Expired unresolved</div><div class="value">0</div></div>
+  <div class="stat"><div class="label">Brier</div><div class="value">—</div></div>
+  <div class="stat"><div class="label">First resolution</div><div class="value">Jul 15</div></div>
 </section>
 
-<section class="predictions">
-<p style='color:var(--muted)'>No predictions posted yet.</p>
-</section>
+<div class="links">
+  <h3>Read more</h3>
+  <a href="https://github.com/Johnmalpass/hunter-research">Code repository (MIT)</a>
+  <a href="https://github.com/Johnmalpass/hunter-research/blob/main/preregistration.json">Pre-registration manifest (SHA-locked at <code>f39d2f5ff6b3e695</code>)</a>
+  <a href="methodology_brief.pdf">Methodology brief (2-page PDF)</a>
+  <a href="https://github.com/Johnmalpass/hunter-research/blob/main/docs/LIMITATIONS.md">Known limitations</a>
+  <a href="https://github.com/Johnmalpass/hunter-research/blob/main/docs/pre_freeze_findings_summary.md">Pre-freeze patterns (not findings)</a>
+</div>
 
 <footer>
-  <div>Generated 2026-04-20 16:10 UTC. Auto-regenerated daily.</div>
-  <div style="margin-top:8px;">John Malpass · BSc Economics · University College Dublin · 2026</div>
+  John Malpass · BSc Economics · University College Dublin · 2026
 </footer>
 
-</div></body></html>
+</div>
+
+<script>
+(function() {
+  const target = new Date('2026-06-01T00:00:00Z').getTime();
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function tick() {
+    const now = Date.now();
+    let diff = Math.max(0, target - now);
+    const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+    const h = Math.floor(diff / 3600000); diff -= h * 3600000;
+    const m = Math.floor(diff / 60000); diff -= m * 60000;
+    const s = Math.floor(diff / 1000);
+    document.getElementById('cd-days').textContent = d;
+    document.getElementById('cd-hours').textContent = pad(h);
+    document.getElementById('cd-minutes').textContent = pad(m);
+    document.getElementById('cd-seconds').textContent = pad(s);
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+</body></html>

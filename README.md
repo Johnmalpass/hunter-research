@@ -14,6 +14,8 @@ HUNTER is a Python program that reads across all of them at once. It pulls dated
 
 It is also the measurement platform for a pre-registered 12-week empirical study of *compositional alpha*, cross-silo information asymmetries no single specialist captures, running out-of-sample from June 1 through August 31, 2026.
 
+*Compositional alpha* is return that exists only at the join of two or more silos and disappears if you decompose the thesis back into its single-silo components. HUNTER's job is to find it, adversarially kill it when it's false, and publicly log the survivors.
+
 ## Status
 
 **Early research.** The pipeline is built and runs. The corpus is frozen. The prediction board is live and empty on purpose: it fills from June 1 as summer hypotheses clear the upgraded three-tier pipeline (Opus 4.7 for the critical reasoning, Sonnet 4.5 for extraction, Haiku 4.5 for ingestion). Zero predictions have resolved as of launch. First resolutions hit the ledger mid-July. The 12-week summer study is the first real out-of-sample run.
@@ -70,22 +72,20 @@ Three model tiers are wired up in `config.py`: Opus 4.7 for the critical reasoni
 
 ## Pipeline
 
+```mermaid
+flowchart LR
+  A["INGEST<br/>18 silos<br/>220 queries"] --> B["EXTRACT<br/>fact + implications<br/>+ model-fields"]
+  B --> C["DETECT<br/>anomalies<br/>(weirdness)"]
+  C --> D["COLLIDE<br/>7 strategies<br/>in parallel"]
+  D --> E["FORM<br/>hypothesis +<br/>resolution date"]
+  E --> F["KILL<br/>mechanism +<br/>fact + competitor<br/>+ barrier + market"]
+  F --> G["SCORE<br/>6 dims +<br/>4 anchors<br/>(fresh context)"]
+  G --> H["LEDGER<br/>public board"]
 ```
-┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
-│  INGEST  │──▶│  EXTRACT │──▶│  DETECT  │──▶│  COLLIDE │
-│ 18 silos │   │  fact +  │   │ anomalies│   │ 7 strat. │
-│ 220 q.   │   │ implica. │   │ weirdness│   │ matching │
-└──────────┘   └──────────┘   └──────────┘   └──────────┘
-                                                   │
-                                                   ▼
-┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
-│  LEDGER  │◀──│  SCORE   │◀──│   KILL   │◀──│  FORM    │
-│ public   │   │ 6 dims + │   │ mech +   │   │ hypo. +  │
-│ board    │   │ anchors  │   │ fact +   │   │ resol'n  │
-│          │   │ (fresh   │   │ compet + │   │ date     │
-│          │   │ context) │   │ barrier  │   │          │
-└──────────┘   └──────────┘   └──────────┘   └──────────┘
-```
+
+**Causal graph** (199 methodology nodes, 171 directed edges with named transmission pathways; hub-and-spoke around ARGUS Enterprise DCF):
+
+![HUNTER causal graph](docs/img/causal_graph.png)
 
 Every stage is defined in `prompts.py` (26 LLM prompts, one per step) and routed through `config.py` (18 source types, 153-pair hand-calibrated domain distance matrix, 220 ingest queries). The causal graph, model-field extractions, and adversarial review traces all persist to 43 database tables.
 
@@ -134,7 +134,7 @@ A 12-week out-of-sample study runs June 1 through August 31, 2026 on the frozen 
 - Primary loses (D ≤ B or monotonicity violated): reject; null-result paper ships.
 - No post-hoc corpus additions. No scoring-weight changes. No primary/secondary swap. No retroactive exclusion. All four strata reported regardless of sign.
 
-**Prior contradictory evidence, and why the study still runs.** An earlier retrospective pilot (the "v3 Golden" validation run, `V3_GOLDEN_*` constants in `config.py`) produced Stratum D < Stratum B, directly contradicting H1. That pilot ran with `RETROSPECTIVE_DISABLE_WEB_SEARCH = True`, i.e. the kill phase could not check causal mechanisms against live web evidence, which is the specific channel through which cross-silo advantages are supposed to manifest. The summer 2026 study runs prospectively with web-searched mechanism kills, the regime H1 is actually about. If the summer study also produces D ≤ B or violates monotonicity, the manifest's decision rule kicks in: reject H1, ship the null paper, treat the framework as needing structural revision (not recalibration). See `THEORY_CANON.md` §2 claim C4 for the full epistemic state.
+**Prior contradictory evidence, and why the study still runs.** An earlier retrospective pilot (the "v3 Golden" validation run, `V3_GOLDEN_*` constants in `config.py`) produced Stratum D < Stratum B, directly contradicting H1. That pilot ran with `RETROSPECTIVE_DISABLE_WEB_SEARCH = True`, i.e. the kill phase could not check causal mechanisms against live web evidence, which is the specific channel through which cross-silo advantages are supposed to manifest. The summer 2026 study runs prospectively with web-searched mechanism kills, the regime H1 is actually about. If the summer study also produces D ≤ B or violates monotonicity, the manifest's decision rule kicks in: reject H1, ship the null paper, treat the framework as needing structural revision (not recalibration). See `docs/THEORY_CANON.md` §2 claim C4 for the full epistemic state.
 
 Drift during the study is auto-detected by `python run.py preregister check` and reported in the final paper.
 
@@ -160,8 +160,15 @@ Instrument / methodology:
 - **Corpus and derived data.** CC-BY-4.0 (see `LICENSE_DATA`). Redistribute with attribution.
 - **Working papers and posts.** CC-BY-4.0 unless marked otherwise.
 
+## Reading order
+
+- **Quick reader.** README, then the methodology brief PDF (`docs/methodology_brief.pdf`).
+- **Serious reader.** README, then `docs/HUNTER_STORY.md` for the narrative, then `docs/EMPIRICAL_FINDINGS.md` for what the pre-freeze data actually said (including where the framework's predictions failed), then `docs/THEORY_CANON.md` for the canonical vocabulary and the formally withdrawn overclaims.
+- **Replicator.** The above, plus `preregistration.json` with the SHA-locked manifest, plus `python run.py preregister check` against the frozen corpus.
+
 ## Contact
 
 Honest critique, prior-art pointers, and replication attempts welcome. No cold pitches, this is a research project.
 
-John Malpass, University College Dublin, email on the Zenodo record and Substack About page.
+**John Malpass** · University College Dublin · `johnjosephmalpass@gmail.com`
+GitHub: [@Johnmalpass](https://github.com/Johnmalpass) · Substack: *The HUNTER Ledger* (linked in the GitHub About sidebar).

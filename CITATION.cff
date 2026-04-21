@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "HUNTER: An Autonomous Research Instrument for Cross-Silo Financial Inference"
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Malpass
+    given-names: John
+    affiliation: University College Dublin
+    email: johnjosephmalpass@gmail.com
+date-released: 2026-04-28
+version: "1.0.0"
+license: MIT
+repository-code: "https://github.com/Johnmalpass/hunter-research"
+url: "https://johnmalpass.github.io/hunter-research/"
+keywords:
+  - compositional alpha
+  - cross-silo inference
+  - limits to arbitrage
+  - epistemic residual
+  - pre-registered empirical finance
+  - financial knowledge graph
+  - model-field extraction
+identifiers:
+  - type: other
+    value: "SHA-256 code hash f39d2f5ff6b3e695 (locked 2026-04-19)"
+    description: "Pre-registration manifest lock"
