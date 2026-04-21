@@ -14,7 +14,7 @@ This is a simple, interpretable, auditable form of online learning.
 No ML model to train. Just cosine similarity against a rolling window
 of closed positions.
 
-Bain-defensible framing: this is "regime-aware scoring" — the system
+Framing: this is "regime-aware scoring" — the system
 learns which kinds of theses have been rewarded by the market *recently*
 and adjusts confidence accordingly. Not a black box.
 """

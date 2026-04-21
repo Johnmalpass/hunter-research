@@ -360,15 +360,8 @@ These findings update the pre-registered study:
 
 ---
 
-## Why this report matters for Bain
+## Why this report is framed this way
 
-This is not "here's a theory." This is "here's a theory, here's the data,
-here's what the data says, here's what's wrong with the theory, here's the
-fix."
+This is not "here's a theory." This is "here's a theory, here's the data, here's what the data says, here's what's wrong with the theory, here's the fix."
 
-Most pitch decks you'll see from researchers claim the theory works. This
-report documents the **two major places it doesn't** and still recommends
-proceeding — because the *direction* is right and the *fixes are identifiable*.
-
-That's the distinction between confirmation-hunting and science. Bain funds
-the latter.
+Most empirical reports from researchers claim the theory works. This report documents the **two major places it doesn't** and still recommends proceeding, because the *direction* is right and the *fixes are identifiable*. The distinction is between confirmation-hunting and science; HUNTER is explicitly designed to produce the latter, which is why the pre-freeze patterns above are held as hypotheses for the summer study to test, not as confirmed findings.

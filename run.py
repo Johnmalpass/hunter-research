@@ -42,7 +42,7 @@ Governance commands:
 
 Reports:
     report            Generate the latest PDF intelligence report.
-    pitch             Open the Bain pitch markdown (uses $PAGER).
+    pitch             Open the internal pitch markdown if present (uses $PAGER).
 
 Inverse HUNTER (alpha flywheel):
     decompose '<belief text>' [asset] [source]

@@ -223,7 +223,7 @@ DOMAIN_BY_NAME = {d["name"]: d for d in DOMAINS}
 # === v2 Fact-Collision Architecture ===
 
 # Ingest/Collision ratio -- 50/50 steady state
-# Bain types approaching parity, balanced ingest and collision
+# Core source types approaching parity, balanced ingest and collision
 INGEST_RATIO = 0.5
 
 # Collision lookback windows
@@ -360,7 +360,7 @@ DATA_SOURCES = [
     {"type": "pharmaceutical", "query": "clinical trial results published phase 3 2026"},
     {"type": "regulation", "query": "Office of Generic Drugs ANDA review backlog 2025 2026 approval delays"},
     {"type": "sec_filing", "query": "pharmaceutical company 10-K single product revenue dependency patent expiring 2026"},
-    # === BAIN CAPITAL TARGETED QUERIES ===
+    # === CORE DOMAIN TARGETED QUERIES ===
     # Domain 1: Commercial Real Estate Distress & Credit
     {"type": "cre_credit", "query": "CMBS delinquency rate increase office retail 2026"},
     {"type": "cre_credit", "query": "commercial real estate loan maturity wall refinancing gap 2026"},
@@ -847,11 +847,11 @@ GAP_TARGETING_RATIO = 0.20  # 20% of ingest cycles use gap-targeted queries
 
 # === Self-Balancing System ===
 
-# Focus mode: "default" = maximum breadth, "bain" = anchor in Bain verticals
-FOCUS_MODE = "bain"
+# Focus mode: "default" = maximum breadth, "core" = anchor in priority source verticals
+FOCUS_MODE = "core"
 
-# Bain-relevant source types (canonical definition — dashboard imports from here)
-BAIN_SOURCE_TYPES = {
+# Core / priority source types (canonical definition — dashboard imports from here)
+CORE_SOURCE_TYPES = {
     "cre_credit", "specialty_re", "insurance",
     "healthcare_re", "energy_infra", "distressed",
 }

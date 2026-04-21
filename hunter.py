@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 import config  # Module-level access for v3 Golden dynamic config
 from config import (
-    BAIN_SOURCE_TYPES,
+    CORE_SOURCE_TYPES,
     DATA_SOURCES,
     DEEP_DIVE_THRESHOLD,
     DOMAINS,
@@ -1404,12 +1404,12 @@ Respond with ONLY: {{"causal_chain_length": 1}}"""
             scored_anomalies.sort(key=lambda x: x[0], reverse=True)
 
             # ANOMALY SELECTION: depends on focus mode
-            if FOCUS_MODE == "bain":
-                # ANCHOR/BRIDGE: 1 anchor from Bain domains + 2 bridges from non-Bain
+            if FOCUS_MODE == "core":
+                # ANCHOR/BRIDGE: 1 anchor from core domains + 2 bridges from non-core
                 anchor_pool = [(s, a) for s, a in scored_anomalies
-                               if a.get("source_type", "") in BAIN_SOURCE_TYPES]
+                               if a.get("source_type", "") in CORE_SOURCE_TYPES]
                 bridge_pool = [(s, a) for s, a in scored_anomalies
-                               if a.get("source_type", "") not in BAIN_SOURCE_TYPES]
+                               if a.get("source_type", "") not in CORE_SOURCE_TYPES]
 
                 anomalies_to_check = []
 
@@ -1429,7 +1429,7 @@ Respond with ONLY: {{"causal_chain_length": 1}}"""
 
                 # Fallback: if bridge pool is too thin, relax and fill from any scored anomalies
                 if len(anomalies_to_check) < 3:
-                    print_info("Bain mode: bridge pool thin, relaxing constraint for this cycle")
+                    print_info("Core mode: bridge pool thin, relaxing constraint for this cycle")
                     for _, a in scored_anomalies:
                         if a not in anomalies_to_check and len(anomalies_to_check) < 3:
                             anomalies_to_check.append(a)
@@ -1958,22 +1958,22 @@ Respond with ONLY a JSON object:
         matching_facts = []
         used_ids = set()
 
-        # Determine if this anomaly is a Bain anchor (for fact pool prioritisation)
-        _anomaly_is_bain_anchor = (FOCUS_MODE == "bain" and
-                                    anomaly.get("source_type", "") in BAIN_SOURCE_TYPES)
+        # Determine if this anomaly is a core anchor (for fact pool prioritisation)
+        _anomaly_is_core_anchor = (FOCUS_MODE == "core" and
+                                    anomaly.get("source_type", "") in CORE_SOURCE_TYPES)
 
         def _pick_diverse(pool, n):
             """Pick up to n facts from pool, one per source type first, then backfill.
             Enforces minimum 2 distinct source types when pool has them and n >= 2.
-            In Bain mode: anchor anomalies prefer non-Bain facts (maximise bridge distance).
+            In Core mode: anchor anomalies prefer non-core facts (maximise bridge distance).
             """
-            # In Bain mode, sort pool to prefer cross-domain facts
+            # In Core mode, sort pool to prefer cross-domain facts
             sorted_pool = pool
-            if FOCUS_MODE == "bain":
-                if _anomaly_is_bain_anchor:
-                    sorted_pool = sorted(pool, key=lambda f: f.get("source_type", "") in BAIN_SOURCE_TYPES)
+            if FOCUS_MODE == "core":
+                if _anomaly_is_core_anchor:
+                    sorted_pool = sorted(pool, key=lambda f: f.get("source_type", "") in CORE_SOURCE_TYPES)
                 else:
-                    sorted_pool = sorted(pool, key=lambda f: f.get("source_type", "") not in BAIN_SOURCE_TYPES)
+                    sorted_pool = sorted(pool, key=lambda f: f.get("source_type", "") not in CORE_SOURCE_TYPES)
 
             picked = []
             by_source = {}

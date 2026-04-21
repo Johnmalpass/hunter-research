@@ -34,7 +34,7 @@ from database import (
     init_db,
     toggle_reviewed,
 )
-from config import SOURCE_ICONS, BAIN_SOURCE_TYPES
+from config import SOURCE_ICONS, CORE_SOURCE_TYPES
 from targeting import suggest_firms, generate_domains_for_firm, run_overseer, chat_with_hunter
 from database import (
     get_active_targets, save_target, remove_target,
@@ -316,12 +316,12 @@ with section_tab1:
                 if src == "test": continue
                 icon = SOURCE_ICONS.get(src, "")
                 count = int(pct * stats["total_facts"])
-                src_type = "Bain" if src in BAIN_SOURCE_TYPES else "Original"
+                src_type = "Core" if src in CORE_SOURCE_TYPES else "Original"
                 src_data.append({"Source": f"{icon} {src}", "Facts": count, "Type": src_type})
 
             df_src = pd.DataFrame(src_data).sort_values("Facts", ascending=True)
             fig_src = go.Figure()
-            for stype, color in [("Original", ACCENT), ("Bain", "#059669")]:
+            for stype, color in [("Original", ACCENT), ("Core", "#059669")]:
                 mask = df_src["Type"] == stype
                 fig_src.add_trace(go.Bar(
                     y=df_src[mask]["Source"], x=df_src[mask]["Facts"], orientation="h",
@@ -417,8 +417,8 @@ with section_tab1:
         if facts:
             for f in facts:
                 icon = SOURCE_ICONS.get(f["source_type"], "\U0001f4cc")
-                bain_b = " \U0001f3af" if f["source_type"] in BAIN_SOURCE_TYPES else ""
-                with st.expander(f"{icon} {f['title'][:80]}{bain_b}", expanded=False):
+                core_b = " \U0001f3af" if f["source_type"] in CORE_SOURCE_TYPES else ""
+                with st.expander(f"{icon} {f['title'][:80]}{core_b}", expanded=False):
                     st.markdown(f"**{f['source_type']}** | {f.get('date_of_fact', '?')} | Obscurity: {f.get('obscurity', '?')}")
                     imps = _parse_json(f.get("implications"))
                     if imps:
