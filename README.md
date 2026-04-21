@@ -24,7 +24,7 @@ Some patterns showed up in the pre-freeze corpus. A sharp asymmetry between mech
 
 ## Provenance
 
-This repository is the public release of a six-month private solo build (November 2025 through April 2026). The git history shows a short commit series because the audit trail was never intended to live in git: it lives in the SHA-256-locked pre-registration manifest (`preregistration.json`, code hash `f39d2f5ff6b3e695`, locked 2026-04-19), the timestamped frozen corpus on Zenodo (DOI pending), and the public, timestamped prediction board. Anyone auditing a claim runs `python run.py preregister check` against the manifest; independent replication runs against the frozen Zenodo corpus and the locked code hash, not against the commit history.
+This repository is the public release of a six-month private solo build (November 2025 through April 2026). The git history shows a short commit series because the audit trail was never intended to live in git: it lives in the SHA-256-locked pre-registration manifest (`preregistration.json`, code hash `f39d2f5ff6b3e695`, locked 2026-04-19), the timestamped frozen corpus on Zenodo (DOI [10.5281/zenodo.19667567](https://doi.org/10.5281/zenodo.19667567)), and the public, timestamped prediction board. Anyone auditing a claim runs `python run.py preregister check` against the manifest; independent replication runs against the frozen Zenodo corpus and the locked code hash, not against the commit history.
 
 ## Corpus reconciliation
 
@@ -149,7 +149,7 @@ Pre-freeze patterns (the mechanism-vs-audience kill asymmetry, the hub-and-spoke
 ## How to cite
 
 Corpus:
-> Malpass, J. (2026). *HUNTER Cross-Silo Financial Corpus v1 (frozen April 2026)* [Data set]. Zenodo. https://doi.org/XXXXX
+> Malpass, J. (2026). *HUNTER Cross-Silo Financial Corpus v1 (frozen April 2026)* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.19667567
 
 Instrument / methodology:
 > Malpass, J. (2026). *HUNTER: An Autonomous Research Instrument for Cross-Silo Financial Inference* (Working Paper 0). SSRN.
