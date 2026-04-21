@@ -163,7 +163,7 @@ Instrument / methodology:
 ## Reading order
 
 - **Quick reader.** README, then the methodology brief PDF (`docs/methodology_brief.pdf`).
-- **Serious reader.** README, then `docs/DATA_OVERVIEW.md` for the complete table-by-table inventory (every non-trivial table, row counts, what's inside), then `docs/research_themes.md` for the eight structural themes HUNTER keeps surfacing, then `docs/HUNTER_STORY.md` for the narrative, then `docs/EMPIRICAL_FINDINGS.md` for what the pre-freeze data actually said (including where the framework's predictions failed), then `docs/THEORY_CANON.md` for the canonical vocabulary and the formally withdrawn overclaims.
+- **Serious reader.** README, then `docs/DATA_OVERVIEW.md` for the complete table-by-table inventory, then `docs/HUNTER_THEORY.md` for the ten-layer theoretical framework, then `docs/engineering_evolution.md` for how the instrument changed between old and current pipelines, then `docs/research_themes.md` for the eight structural themes HUNTER keeps surfacing, then `docs/HUNTER_STORY.md` for the narrative, then `docs/EMPIRICAL_FINDINGS.md` for what the pre-freeze data actually said, then `docs/THEORY_CANON.md` for the canonical vocabulary and the formally withdrawn overclaims.
 - **Replicator.** The above, plus `preregistration.json` with the SHA-locked manifest, plus `python run.py preregister check` against the frozen corpus.
 
 ## Contact
