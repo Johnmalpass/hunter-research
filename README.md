@@ -2,7 +2,7 @@
 
 **An autonomous research engine that reads across 18 professional financial silos and keeps a public, timestamped ledger of what the integration reveals.**
 
-![status: early](https://img.shields.io/badge/status-early%20research-orange) ![license: MIT](https://img.shields.io/badge/code-MIT-blue) ![corpus: CC-BY-4.0](https://img.shields.io/badge/corpus-CC--BY--4.0-green) ![preregistered](https://img.shields.io/badge/preregistered-2026--04--19-blueviolet)
+![status: early](https://img.shields.io/badge/status-early%20research-orange) ![license: MIT](https://img.shields.io/badge/code-MIT-blue) ![corpus: CC-BY-4.0](https://img.shields.io/badge/corpus-CC--BY--4.0-green) ![preregistered](https://img.shields.io/badge/preregistered-2026--04--19-blueviolet) ![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19667567-informational)
 
 ---
 
@@ -12,7 +12,7 @@ Walk through any big financial firm and you'll see specialists who don't cross-r
 
 HUNTER is a Python program that reads across all of them at once. It pulls dated facts from 18 silos (patents, SEC filings, NAIC reserves, OSHA actions, CMBS delinquency, Federal Register rules, commodity inventories, analyst targets, academic preprints, pharma approvals, distressed credit, healthcare REITs, energy infrastructure, specialty real estate, government contracts, earnings transcripts, job listings, app rankings), breaks each fact into entities / implications / methodology fields / named causal arrows, looks for pairs that together imply something neither implies alone, runs each pair through a four-round kill gauntlet designed to destroy it, and posts survivors to a public prediction board with an asset, a direction, and a resolution date.
 
-It is also the measurement platform for a pre-registered 12-week empirical study of *compositional alpha*, cross-silo information asymmetries no single specialist captures, running out-of-sample from June 1 through August 31, 2026.
+It is also the measurement platform for a pre-registered 12-week empirical study of *compositional alpha* — cross-silo information asymmetries no single specialist captures — running out-of-sample from June 1 through August 31, 2026.
 
 *Compositional alpha* is return that exists only at the join of two or more silos and disappears if you decompose the thesis back into its single-silo components. HUNTER's job is to find it, adversarially kill it when it's false, and publicly log the survivors.
 
@@ -20,7 +20,26 @@ It is also the measurement platform for a pre-registered 12-week empirical study
 
 **Early research.** The pipeline is built and runs. The corpus is frozen. The prediction board is live and empty on purpose: it fills from June 1 as summer hypotheses clear the upgraded three-tier pipeline (Opus 4.7 for the critical reasoning, Sonnet 4.5 for extraction, Haiku 4.5 for ingestion). Zero predictions have resolved as of launch. First resolutions hit the ledger mid-July. The 12-week summer study is the first real out-of-sample run.
 
-Some patterns showed up in the pre-freeze corpus. A sharp asymmetry between mechanism-focused and audience-focused kill success. A hub-and-spoke shape in the methodology graph around ARGUS Enterprise DCF cap-rate assumptions. A bimodal distribution of quality scores. A negative correlation between narrative strength and kill survival (r = −0.49). Nine closed Tarjan cycles. None of these are claimed as findings. They are held back as hypotheses the summer will test.
+Some patterns showed up in the pre-freeze corpus. A hub-and-spoke shape in the methodology graph around ARGUS Enterprise DCF cap-rate assumptions. A hump curve at composition depth 2 that replicates across two independent pipeline iterations. Nine closed Tarjan cycles, every one of them satisfying the stability condition *reinforcement ≥ correction* that the framework predicts. A sharp asymmetry between mechanism-focused and audience-focused kill success. A bimodal distribution of quality scores. A negative correlation between narrative strength and kill survival (r = −0.49, scoped to the n = 61 main-pipeline subset). None of these are claimed as findings. They are held back as hypotheses the summer will test. See `docs/MATH_VERIFICATION.md` for the empirical detail on what the pre-freeze corpus actually supports, refutes, and leaves open.
+
+## Theoretical framework at a glance
+
+The framework is a ten-layer theory of compositional information asymmetry. The first seven layers extend existing literatures (Shannon rate-distortion, Hong–Stein attention, Arrow–Debreu completeness) into the compositional regime. The last three — **epistemic cycles**, **the cycle hierarchy**, and **fractal incompleteness** — are the framework's original contributions.
+
+| # | Layer | Core claim | Pre-freeze status |
+|---|---|---|---|
+| 1 | Translation Loss | Information degrades at silo boundaries | Cross-silo > within-silo supported (+9.1 pts) |
+| 2 | Attention Topology | Autopoietic fixed point; market's infrastructure reorganises to confirm its own beliefs | Hub-and-spoke graph with degree-9 ARGUS hub supports |
+| 3 | The Question Gap | Wrong loss function; missing variables the market doesn't know it's missing | 423 negative-inference detections; summer tests |
+| 4 | Epistemic Phase Transitions | Discontinuous framework shifts; universality classes | 18 phase-transition signals; not yet tested |
+| 5 | Rate-Distortion Bedrock | Shannon floor on compositional residual; novel *interaction-distortion function* | Foundational; no data required |
+| 6 | Market Incompleteness | Gödelian trilemma; self-protection property | Conjecture pending collaboration with senior theorist |
+| 7 | Depth-Value Distribution | Hump curve, convergent sum | Shape supported (peak at d=2); specific α = 0.27 **refuted** (observed α ≈ 0.94) |
+| 8 | Epistemic Cycles ★ | Self-reinforcing closed loops are stable equilibria | All 9 detected cycles satisfy r ≥ c |
+| 9 | The Cycle Hierarchy ★ | Higher-dimensional topology (H₀ → H₁ → H₂ → Hₙ) | 2 of 9 taxonomy types observed; rest theoretical |
+| 10 | Fractal Incompleteness ★ | Self-similar, computationally intractable structure | Structural claim from combinatorial growth |
+
+★ original contribution. For the complete layer-by-layer argument including the **three walls** that prevent market completion (Verification, Regeneration, Self-Reference), see `docs/HUNTER_THEORY.md`. For every quantitative prediction tested against the frozen corpus — three supported, two refuted, one mixed — see `docs/MATH_VERIFICATION.md`.
 
 ## Provenance
 
@@ -36,7 +55,8 @@ This is built and run by one person: John Malpass, second-year BSc Economics at 
 
 ## Key artifacts
 
-- **Corpus (Zenodo, CC-BY-4.0).** 12,030 facts across 18 silos, 77 countries, 30,967 normalised entity-index entries, 11,835 distinct entities, 6,670 model-field extractions, 1,570 detected anomalies, 606 tracked expirations (dated future catalysts), 474 cross-silo collisions, 113 held collisions, 52 multi-link chains, 171 directed causal edges with named transmission pathways, 20 differential-edge records, 12 knowledge-graph nodes, 9 Tarjan cycles, 138 kill-failure topology pairs, 423 negative-inference gap detections, 324 hypotheses with completed adversarial review across two pipeline iterations (263 in `hypotheses_archive` from the earlier run, March 28–April 3, 2026; 61 in `hypotheses` from the later adversarial-review-upgrade run, April 1–4, 2026), 16 deep-dive expansions on top findings, 45 `findings` at diamond ≥ 65, 61 narrative scores, 61 residual classifications, 18 phase-transition signals, and 1,155 theory-evidence records across 13 framework layers. See `docs/DATA_OVERVIEW.md` for the complete table-by-table catalogue. DOI: [10.5281/zenodo.19667567](https://doi.org/10.5281/zenodo.19667567).
+- **Corpus (Zenodo, CC-BY-4.0).** 12,030 facts across 18 silos, 77 countries, 30,967 normalised entity-index entries, 11,835 distinct entities, 6,670 model-field extractions, 1,570 detected anomalies, 606 tracked expirations (dated future catalysts), 474 cross-silo collisions, 113 held collisions, 52 multi-link chains, 171 directed causal edges with named transmission pathways, 20 differential-edge records, 12 knowledge-graph nodes, 9 Tarjan cycles, 138 kill-failure topology pairs, 423 negative-inference gap detections, 324 hypotheses with completed adversarial review across two pipeline iterations (263 in `hypotheses_archive` from the earlier run, March 28 – April 3, 2026; 61 in `hypotheses` from the later adversarial-review-upgrade run, April 1–4, 2026), 16 deep-dive expansions on top findings, 45 `findings` at diamond ≥ 65, 61 narrative scores, 61 residual classifications, 18 phase-transition signals, and 1,155 theory-evidence records across 13 framework layers. See `docs/DATA_OVERVIEW.md` for the complete table-by-table catalogue. DOI: [10.5281/zenodo.19667567](https://doi.org/10.5281/zenodo.19667567).
+- **Diamond theses catalogue.** `docs/diamond_theses.md` — eighteen pre-freeze diamond-tier hypotheses, grouped into three tiers by adversarial-review score, every one resolvable to a specific row in the Zenodo corpus. Candidates, not findings; the summer tests them.
 - **Methods paper (Paper 0, SSRN).** Instrument, pipeline, the novel methodology triad, kill-phase design. Submission pending April 2026.
 - **Additional working papers.** Drafts on the mechanism-assembly bottleneck, the formal compositional residual, and the cross-silo composition test ship through summer and autumn. Empirical claims are presented as pre-registered hypotheses until summer replication completes.
 - **Prediction board.** Public, timestamped, resolvable. URL: `https://johnmalpass.github.io/hunter-research/`
@@ -83,13 +103,15 @@ flowchart LR
   G --> H["LEDGER<br/>public board"]
 ```
 
-**Causal graph** (199 methodology nodes, 171 directed edges with named transmission pathways; hub-and-spoke around ARGUS Enterprise DCF):
-
-![HUNTER causal graph](docs/img/causal_graph.png)
-
 Every stage is defined in `prompts.py` (26 LLM prompts, one per step) and routed through `config.py` (18 source types, 153-pair hand-calibrated domain distance matrix, 220 ingest queries). The causal graph, model-field extractions, and adversarial review traces all persist to 43 database tables.
 
 The seven collision strategies run in parallel per anomaly: implication matching, entity matching, keyword matching, model-field matching, causal-graph traversal, embedding similarity, belief-reality contradiction. Matches get blended, evaluated by an LLM, checked against prior publication, and promoted to hypotheses with resolution dates. The kill gauntlet then runs four adversarial rounds (mechanism, fact-check, competitor, barrier) plus a market-check; survivors get scored in a fresh context by an adversarial reviewer against four calibration anchors.
+
+## Causal topology
+
+![HUNTER causal graph — hub-and-spoke around ARGUS Enterprise DCF](docs/img/causal_graph.png)
+
+The pre-freeze methodology graph has **203 nodes, 171 directed edges, a 5-unit gap at degrees 4–8, and a single degree-9 outlier** — ARGUS Enterprise DCF cap-rate assumptions. That's the hub-and-spoke signature the framework's Layer 2 predicts, and it is what a scale-free power law would *not* produce. The concentration is substantively meaningful: a regulator or software vendor that updated ARGUS's default cap-rate assumption would propagate through nine distinct causal pathways simultaneously, each terminating in a different professional silo. See `docs/MATH_VERIFICATION.md` Test 4 for the full degree-distribution analysis and the falsification against scale-free.
 
 ## Modules
 
@@ -163,7 +185,7 @@ Instrument / methodology:
 ## Reading order
 
 - **Quick reader.** README, then the methodology brief PDF (`docs/methodology_brief.pdf`).
-- **Serious reader.** README, then `docs/DATA_OVERVIEW.md` for the complete table-by-table inventory, then `docs/HUNTER_THEORY.md` for the ten-layer theoretical framework, then `docs/MATH_VERIFICATION.md` for the empirical verification of every quantitative theory prediction against the frozen corpus (three supported, two refuted, with charts), then `docs/engineering_evolution.md` for how the instrument changed between old and current pipelines, then `docs/research_themes.md` for the eight structural themes HUNTER keeps surfacing, then `docs/HUNTER_STORY.md` for the narrative, then `docs/EMPIRICAL_FINDINGS.md` for what the pre-freeze data actually said, then `docs/THEORY_CANON.md` for the canonical vocabulary and the formally withdrawn overclaims.
+- **Serious reader.** README → `docs/DATA_OVERVIEW.md` (complete table-by-table inventory) → `docs/HUNTER_THEORY.md` (ten-layer framework, the three walls, the topological hierarchy) → `docs/MATH_VERIFICATION.md` (empirical verification of every quantitative prediction against the frozen corpus; three supported, two refuted, with charts) → `docs/diamond_theses.md` (eighteen top pre-freeze theses, each resolvable to a Zenodo row) → `docs/engineering_evolution.md` (how the instrument changed between old and current pipelines) → `docs/research_themes.md` (eight structural themes HUNTER keeps surfacing) → `docs/HUNTER_STORY.md` (narrative) → `docs/EMPIRICAL_FINDINGS.md` (what the pre-freeze data actually said) → `docs/THEORY_CANON.md` (canonical vocabulary and the formally withdrawn overclaims).
 - **Replicator.** The above, plus `preregistration.json` with the SHA-locked manifest, plus `python run.py preregister check` against the frozen corpus.
 
 ## Contact

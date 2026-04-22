@@ -132,6 +132,8 @@ Compositional value follows a characteristic distribution across depth. At depth
 
 **Intuition.** Each time you add a domain, you must find facts in that domain AND verify they interact meaningfully with the previous facts. Interaction failures multiply: at depth 1, ~70% of pairs interact; at depth 2, ~50% of triples; at depth 3, ~30% of quads; by depth 8, only ~1% of octuples have meaningful signal.
 
+**Per-link confidence compounding.** The other half of the hump-curve intuition is confidence, not just value. Each cross-silo link in a compositional thesis has a confidence coefficient — call it $c_\ell$. A depth-5 thesis with every link at 80% confidence compounds to $0.8^5 \approx 33\%$ joint confidence. A depth-8 thesis at the same per-link confidence is $0.8^8 \approx 17\%$. **The theoretical residual grows with depth; the extractable residual is residual times confidence, and confidence decays faster than value grows.** This is why the sweet spot sits at depth 2–3 rather than at maximum theoretical depth: that's where the product of (residual magnitude) × (joint confidence) peaks. Depth 6+ has the largest residuals in principle but the confidence floor makes them untradeable — noise dominates signal. HUNTER's effective search range is depth 2 through depth 5; beyond that the confidence compound is fatal.
+
 ### Layer 8 — Epistemic Cycles *(original contribution)*
 
 A cycle is a compositional path that loops: A → B → C → A. Each step contributes to the next, and the final step feeds back to the first. Unlike chains (A → B → C) which terminate, cycles create **self-reinforcing systems**.
@@ -158,11 +160,38 @@ Cycles don't exist in isolation. Simple 3-node cycles nest inside larger cycles,
 3. *Braided cycles:* cycles with shared edges (not just shared nodes); the strongest reinforcement pattern.
 4. *Hierarchical cycles:* cycles of cycles. A 9-node system where each node is itself a 3-node cycle produces a three-level hierarchy. Amplification at level 3 is approximately (decay factor)$^{-3} \approx $ 50–100× stronger than simple chains.
 
+**The topological formalism ($H_0$ through $H_n$).** The move from chains to cycles is a dimensional upgrade. A chain on a graph is one-dimensional — a path. A cycle is two-dimensional — a closed loop enclosing a region. The "interior" of the cycle represents the facts and relationships trapped inside it, invisible from outside. Borrowing algebraic-topology vocabulary, compositional blindness has a natural hierarchy indexed by homological dimension:
+
+| Level | What it is | What it says about the market |
+|---|---|---|
+| $H_0$ | Connected components | How many separate markets exist. Structurally uninteresting in a unified financial system. |
+| $H_1$ | Simple cycles — closed loops | Self-reinforcing mispricings. **This is Layer 8: the epistemic-cycles discovery.** |
+| $H_2$ | Cycles of cycles — voids enclosed by collections of loops | Emergent mispricings produced by the interaction of two or more cycles. Neither cycle alone generates them. |
+| $H_n$ | $n$-th level of topological complexity | Each level a qualitatively different kind of market blindness. |
+
+Each level represents a strictly harder-to-detect form of structural ignorance. The market's inability to see chains is bad; its inability to see cycles is worse; its inability to see interactions between cycles is the deepest form.
+
+**Connection to Gödel.** Chains resemble Gödel's unprovable-but-true statements — they exist in the market's language but cannot be derived from within it. Cycles resemble something stronger: statements that *cannot even be formulated* in the market's native vocabulary. They are not outside the system's proof capability; they are outside its expressive capability. This is inexpressibility rather than mere unprovability, and it is the reason HUNTER's causal-graph extraction step matters even before any pricing work: the graph lets the instrument express what market-internal language cannot.
+
 ### Layer 10 — Fractal Incompleteness *(original contribution)*
 
 No matter how deeply you analyse compositional structures, residual incompleteness persists at every scale. Solve the 3-domain problem, and 4-domain problems remain. Solve all $n$-domain problems up to depth $D$, and depth $D+1$ remains. This is **fractal** — self-similar at every scale.
 
 This follows from information theory: for $N$ domains with $M$ states each, possible compositional states = $M^N$ (exponential growth). But analysis capacity grows polynomially at best. Therefore no matter how sophisticated HUNTER becomes, residual asymmetry that it cannot close will always exist at the next scale.
+
+---
+
+## 3.5 Why the market cannot be completed — the three walls
+
+Even granting a cooperative market that sincerely tries to close the compositional residual, three separate walls prevent completion. Each rules out a distinct remediation strategy. Together they imply that the residual is not merely unfilled — it is unfillable under the market's current organisational constraints.
+
+**The Verification Wall.** Finding a candidate compositional thesis is compute-bounded: run a collision engine long enough and it surfaces candidates. *Verifying* a thesis is reality-bounded: you have to check the causal mechanism against live evidence, and reality returns its evidence on its own timetable. HUNTER's mechanism-kill phase is exactly this wall — it's why the upgraded pipeline produces fewer but harder-to-refute hypotheses than the pre-upgrade archive. Compute can make the search tractable; only reality can close the verification step. The wall stands because no amount of internal reasoning substitutes for external evidence on the specific transmission pathway.
+
+**The Regeneration Wall.** Even an oracle that priced every current compositional state correctly at time $t$ would face new compositional states at $t + \Delta t$ generated by new facts entering the system. The residual is a flow, not a stock. Every new regulatory rule, every new product, every new balance-sheet composition creates fresh interaction terms. Closing the residual at any single moment is meaningless unless the closing mechanism runs continuously — which means the residual is measured against the *rate* of regeneration, not against a fixed pool. HUNTER drinks from a river, not a lake.
+
+**The Self-Reference Wall.** Suppose a hypothetical oracle priced every interaction correctly and broadcast those prices. The broadcasts change the market's beliefs. The changed beliefs change the infrastructure (the attention topology of Layer 2 is autopoietic: infrastructure reorganises around consensus). The changed infrastructure changes the inputs the oracle receives. This is a fixed-point problem over a mapping that may not be a contraction — meaning iteration may never converge. An internal oracle cannot solve this; the act of internalising the information destroys the condition that made the information extractable in the first place. This is the deepest wall and the reason the framework predicts persistent residual rather than a closing edge.
+
+**Why this matters for the instrument.** HUNTER is not trying to defeat these walls. It operates in the space they create. The verification wall means the edge exists; the regeneration wall means it keeps existing; the self-reference wall means it cannot be closed by internalisation. An external, non-market agent reading across silos can surface the residual precisely because it is not part of the fixed point the market has converged to.
 
 ---
 
