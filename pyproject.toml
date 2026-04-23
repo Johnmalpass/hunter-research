@@ -1,0 +1,78 @@
+[project]
+name = "hunter"
+version = "1.0.0"
+description = "Autonomous research instrument for cross-silo financial inference."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "John Malpass", email = "johnjosephmalpass@gmail.com" }
+]
+keywords = [
+    "compositional-alpha",
+    "cross-silo-inference",
+    "limits-to-arbitrage",
+    "pre-registered",
+    "financial-research",
+    "knowledge-graph",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "anthropic>=0.49.0",
+    "streamlit>=1.41.0",
+    "python-dotenv>=1.0.0",
+    "sentence-transformers>=2.2.0",
+    "numpy>=1.24.0",
+    "plotly>=5.18.0",
+    "scipy>=1.11.0",
+    "networkx>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://johnmalpass.github.io/hunter-research/"
+Repository = "https://github.com/Johnmalpass/hunter-research"
+Documentation = "https://github.com/Johnmalpass/hunter-research/tree/main/docs"
+"Pre-registration" = "https://github.com/Johnmalpass/hunter-research/blob/main/preregistration.json"
+Corpus = "https://doi.org/10.5281/zenodo.19667567"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["."]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-ra --strict-markers"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+    "archive/",
+    "__pycache__/",
+    ".venv/",
+    "venv/",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = [
+    "E501",  # line too long, handled by formatter
+    "E402",  # module-level import not at top, intentional in hunter.py
+]
+
+[tool.ruff.lint.per-file-ignores]
+"test_*.py" = ["E402"]

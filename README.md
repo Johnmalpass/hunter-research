@@ -132,7 +132,7 @@ The pre-freeze methodology graph has 203 nodes and 171 directed edges. Most node
 
 **Reports and artifacts.** `generate_report.py`, `enrich_thesis.py`, `build_story_pdf.py`, `targeting.py`.
 
-60+ modules, 52 DB tables, 26 LLM prompts.
+60+ modules, 52 DB tables, 26 LLM prompts. The main engine file (`hunter.py`) is documented section by section in `docs/HUNTER_ARCHITECTURE.md`. Read that before opening the file.
 
 ## Pre-registered summer 2026 study
 
