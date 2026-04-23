@@ -183,6 +183,8 @@ If you want the gist, read this README and the 2-page methodology brief PDF.
 
 If you want the argument, start with `docs/HUNTER_THEORY.md` for the ten layers. Then `docs/MATH_VERIFICATION.md` for what the pre-freeze data actually says about each prediction. Then `docs/diamond_theses.md` for the 18 top-scoring pre-freeze hypotheses. `docs/DATA_OVERVIEW.md` has the table-by-table corpus inventory if you want to dig in.
 
+If you want the inferential framework (identification, power, Bayesian posteriors, multiple-testing correction, robustness specs), read `docs/STATISTICAL_METHODS.md`. The Bayesian re-analysis script `python bayesian_alpha.py` runs the posterior inference against the frozen Zenodo corpus and prints results in under ten seconds.
+
 If you want to replicate, pull the frozen Zenodo corpus, clone this repo, and run `python run.py preregister check` against the locked manifest.
 
 Supporting docs: `docs/engineering_evolution.md` walks through how the pipeline changed between the old and current versions. `docs/research_themes.md` covers the eight recurring structural themes in the top-scoring output. `docs/EMPIRICAL_FINDINGS.md` covers the pre-freeze empirical analysis including the combined 324-hypothesis picture. `docs/THEORY_CANON.md` is the canonical vocabulary plus the formally withdrawn overclaims.
