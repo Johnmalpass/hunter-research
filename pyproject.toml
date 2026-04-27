@@ -43,6 +43,14 @@ dev = [
     "ruff>=0.1.0",
 ]
 
+[tool.setuptools.packages.find]
+# Only the `quant` namespace gets installed as a package. Top-level scripts
+# (hunter.py, theory.py, prompts.py, etc.) stay as scripts run from the repo
+# root; tests find them via pytest's rootdir-on-sys.path behaviour. Without
+# this, setuptools' flat-layout auto-discovery sees both `quant/` and
+# `launch_img/` and errors out.
+include = ["quant*"]
+
 [project.urls]
 Homepage = "https://johnmalpass.github.io/hunter-research/"
 Repository = "https://github.com/Johnmalpass/hunter-research"
