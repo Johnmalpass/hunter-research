@@ -58,3 +58,14 @@ archive/
 *~
 hunter_coin.py
 launch/
+
+# Quant subpackage operational state (private — your edge lives in the calibration)
+quant_data.db
+quant_data.db-journal
+quant_data.db-wal
+quant_data.db-shm
+quant/research/mechanisms/_compiled/
+ibkr_*.json
+trading_config.yaml
+inquiries_export.csv
+publications/

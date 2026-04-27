@@ -61,6 +61,11 @@ I'm John Malpass, an economics student at University College Dublin. I built thi
 - **Methodology brief.** 2-page PDF at `docs/methodology_brief.pdf`, linked on the prediction board.
 - **Pre-registration manifest.** `preregistration.json`, locked at hash `f39d2f5ff6b3e695` on April 19. Corpus frozen March 31.
 - **Methods paper.** Paper 0 on SSRN, submission pending.
+- **Compositional Information Theory equation.** Working draft at `docs/CIT_EQUATION.md`. A five-factor decomposition of compositional alpha (synergy × conversion × lead time × decay − publication cost). Empirical test pre-registered for the summer study.
+
+## Active-development trading-shop infrastructure (`quant/`)
+
+The `quant/` subpackage is an active-development trading-shop architecture built on top of the HUNTER research engine. It includes a four-state regime detector with a 25-year-fitted Markov forecaster, a predicate DSL with an LLM-driven mechanism compiler, synergy-weighted coalition voting, online Bayesian threshold learning, Kelly position sizing with regime conditioning, an audience translator that produces Substack/SSRN/sell-side/Treasury/Twitter formats from a single thesis, a dialect-KL estimator (the empirical instrument for the Universal Translator Theorem), an articulation-lead-time tracker, three independent compositional-depth metrics (synergistic information, the Maxwell-demon-bound Demon Index, and the Kolmogorov-compression K-Score), a strange-loop self-modeller, a persistent seam network for the Open Compositional Atlas, and a TRADER orchestrator that ties it all together. It is independent of the SHA-locked HUNTER engine and may be modified at any time without affecting the summer-2026 pre-registration manifest. Run `python -m quant doctor` for a one-screen system audit.
 
 ## Quick start
 
